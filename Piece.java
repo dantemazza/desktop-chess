@@ -66,7 +66,7 @@ public abstract class Piece implements Cloneable {
 	}
 	
 	
-	public static boolean isEnPossant(Board b, Vector place) {
+	public static boolean isEnPassant(Board b, Vector place) {
 
 		if(b.getMoveCount() == 0) return false;
 		if(!b.lastPieceMoved.getClass().getName().equals("chess.Pawn") ||  b.lastPieceEnd.getX() != b.lastPieceStart.getX() ||
@@ -129,7 +129,7 @@ public abstract class Piece implements Cloneable {
 			if(a.getX() > b.getX() && a.getY() > b.getY()) {
 				j = b.getX() + 1;
 			for(int i=b.getY()+1; i<a.getY(); i++){
-				System.out.println("i: " + i + " j: " + j);
+//				System.out.println("i: " + i + " j: " + j);
 				
 				if(c.isOccupied(new Vector(j,i))) return false;
 				j++;
