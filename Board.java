@@ -410,6 +410,7 @@ public class Board{
 		
 		 
 		 	if(piece.getClass().getName().equals("chess.King")) { 
+				if(inCheck && Math.abs(piece.getPosition().getX()-place.getX()) == 2) return;
 		 		if((piece.getPosition().getX() - place.getX()) == -2) { 
 		 			switch(piece.sideOfBoard) {
 		 			case("Top"):{
