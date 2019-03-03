@@ -1,16 +1,17 @@
 package chess;
 
 import java.util.ArrayList;
-
+//make isInCheck method apply to all piece
 public class Board{
 	private Piece board[][] = new Piece[8][8];
 	char letters = 'a';
-	public boolean inCheck, isATestBoard = false;
+	public boolean inCheck, inDoubleCheck, isATestBoard = false, wasACheck;
 	private int whiteScore, blackScore, moveCount=0;
 	private String capturedSide;
 	private int whoseTurn = 1; 
-	public Piece lastPieceMoved;
-	public Vector lastPieceStart = new Vector(), lastPieceEnd = new Vector(), whiteKingPosition, blackKingPosition;
+	public Piece lastPieceMoved, lastPieceToCheck;
+	public Vector lastPieceStart = new Vector(), lastPieceEnd = new Vector();
+	public Vector whiteKingPosition, blackKingPosition;
 	public final String white = "white";
 	public final String black = "black";
 	public final int xC[] = {1,2,2,1,-1,-2,-2,-1}; 
@@ -59,25 +60,29 @@ public class Board{
 //		board[3][7] = new Bishop(3,7, "Bsp", "black", "Bottom");
 //		board[6][6] = new Queen(6,6, "Bsp", "white", "Bottom");
 	}
-	
+	// conducts all end of turn procedures (variable, score update etc.)
 	public void endTurn(Piece piece, Vector place) {
-//		System.out.println(piece.getPosition().getX() + "," + piece.getPosition().getY());
 		if(piece.getClass().getName().equals("chess.King")) {
-			if(piece.side.equals(black)) blackKingPosition = place;
-			else whiteKingPosition = place;
+			if(piece.side.equals(black)) { blackKingPosition.setVector(place);
+			}
+			else whiteKingPosition.setVector(place);
 		}	
 		 lastPieceStart.setVector(piece.getPosition());	
 		 lastPieceEnd.setVector(place);
-		
+		 
 		 piece.setPosition(place);
-		 if(this.isATestBoard == false) lastPieceMoved = piece;
+		 if(this.isATestBoard == false) {
+			 lastPieceMoved = piece;
+			 
+			 if(lastPieceMoved instanceof Pawn && (lastPieceEnd.getY() == 0 || lastPieceEnd.getY() == 7))
+				 this.setSquare((Piece)new Queen(lastPieceEnd.getX(), lastPieceEnd.getY(), "Q" + moveCount, piece.side, piece.sideOfBoard), lastPieceEnd);
+		 }
 		 moveCount++;
 		 whoseTurn *= -1; 
-//		 System.out.println(this + "," + piece.getPosition().getX() + "," + piece.getPosition().getY());
 
 		 switch(whoseTurn) {
 		 case(1):{
-			 inCheck = this.isInCheck((King) this.getSquare(whiteKingPosition));			
+			 inCheck = this.isInCheck((King)this.getSquare(whiteKingPosition));			
 			 break;
 		 }
 		 case(-1):{
@@ -102,10 +107,17 @@ public class Board{
 		boardClone.whiteScore = c.whiteScore;
 		boardClone.blackScore = c.blackScore;
 		boardClone.whoseTurn = c.whoseTurn;
-		boardClone.lastPieceMoved= c.lastPieceMoved;
-		boardClone.lastPieceStart = c.lastPieceStart;
-		boardClone.whiteKingPosition = c.whiteKingPosition;
-		boardClone.blackKingPosition = c.blackKingPosition;
+		try {
+			boardClone.lastPieceMoved = (Piece) c.lastPieceMoved.clone();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		boardClone.lastPieceStart.setVector(c.lastPieceStart);
+		boardClone.lastPieceEnd.setVector(c.lastPieceEnd);
+		boardClone.whiteKingPosition = new Vector(c.whiteKingPosition);
+		
+		boardClone.blackKingPosition = new Vector(c.blackKingPosition);
 		return boardClone;
 	}
 	
@@ -123,45 +135,59 @@ public class Board{
 		return moveCount;
 	}
 	
+	
+	
+	
+	
+	
 	public boolean isOccupied(Vector v) {
 		return this.getSquare(v) != null;
 	}
 	public boolean isOccupied(int x, int y) {
 		return this.getSquare(x,y) != null;
 	}
+	
+	// creates a board sand box to see verify if a move is valid.
 	public boolean validateMove(Piece piece, Vector place, boolean isntChecker){
-		 Board testCheck = new Board();
+		//returns true if invalid, false if valid
+ 		if(piece instanceof King) {
+		for(int m=0; m<place.getDiag().size(); m++) {
+ 			if(this.isOccupied(place.getDiag().get(m))){
+ 				if(this.getSquare(place.getDiag().get(m)) instanceof King &&
+ 				   this.getSquare(place.getDiag().get(m)).side !=piece.side) return true;}
+ 		}
+ 		for(int m=0; m<place.getHorzVert().size(); m++) {
+ 			if(this.isOccupied(place.getHorzVert().get(m))){
+ 				if(this.getSquare(place.getHorzVert().get(m)) instanceof King &&
+ 				   this.getSquare(place.getHorzVert().get(m)).side != piece.side) return true;}
+ 		}}
+		Board testCheck = new Board();
 		 testCheck = clone(this);
-//		 this.print();
 		 testCheck.isATestBoard = true;
-		 testCheck.move(testCheck.getSquare(piece.getPosition()), place);
-//		 testCheck.print();
-//		 System.out.println();
+		 testCheck.getSquare(piece.getPosition()).move(place, testCheck);
 		 
-//		 this.print();
-//		 System.out.println();
-		 
+		 /*adjusts "whoseTurn" in case it is not the players turn but we would still like to test moves for them
+		  */
 		 if(isntChecker)
 		 testCheck.whoseTurn *= -1;
 		 switch(testCheck.whoseTurn) {
 		 case(1):{ 
+
 			 return testCheck.isInCheck((King)testCheck.getSquare(testCheck.whiteKingPosition));
 			 
 			 
 		 }
 		 case(-1):{
-//			 System.out.println(testCheck.blackKingPosition.getX() + "," + testCheck.blackKingPosition.getY());
-//			 System.out.println(testCheck.board[4][7]);
-			
+
 			 return testCheck.isInCheck((King)testCheck.getSquare(testCheck.blackKingPosition));
 			 
-//			 System.out.println("im here");	 
+	 
 			
 		 }}	 
 		 System.out.println("moveInvalid bypass");
 		return false;
 	}	
-	
+	// prints the board on the console
 	public void print() {
 		for(int c=7; c>-1; c--) {
 			if(c!=7) System.out.println();
@@ -172,45 +198,91 @@ public class Board{
 		System.out.println();
 		
 	}
-	public boolean isInCheck(King king) {
 
-		int y = king.getPosition().getY();
-		int x = king.getPosition().getX();
-		if(king.sideOfBoard == "Bottom" && y < 6) {
+	/* this method is  adjusted to apply to any piece input. In the context of a non-king parameter, 
+	   the method is used to determine if a piece delivering the only check to a king can be captured 
+	   by the checked side legally. */
+	public boolean isInCheck(Piece piece) {
+		int checks = 0;
+		int y = piece.getPosition().getY();
+		int x = piece.getPosition().getX();
+		boolean isKing = piece instanceof King;
+		if(piece.sideOfBoard == "Bottom" && y < 6) {
 		try {
 			if((this.getSquare(x+1,y+1).getClass().getName().equals("chess.Pawn") && 
-				this.getSquare(x+1,y+1).side != king.side) || (this.getSquare(x-1, y+1).side != king.side
-				&&  this.getSquare(x-1,y+1).getClass().getName().equals("chess.Pawn")))
-					return true;  
-		}catch(NullPointerException e){} }
+				this.getSquare(x+1,y+1).side != piece.side)) {
+				if(isKing) {
+				lastPieceToCheck = this.getSquare(x+1, y+1);
+				return true;
+				}else {
+					if(!this.validateMove(this.getSquare(x+1, y+1),piece.getPosition(), false)) return true;	
+				}
+			} 
+			if((this.getSquare(x-1, y+1).side != piece.side &&  
+				this.getSquare(x-1,y+1).getClass().getName().equals("chess.Pawn"))) {
+				if(isKing) {
+				lastPieceToCheck = this.getSquare(x-1, y+1);
+				return true;
+				}else {
+					if(!this.validateMove(this.getSquare(x-1, y+1),piece.getPosition(), false)) return true;	
+				}
+			} 
+					
+		}catch(NullPointerException | ArrayIndexOutOfBoundsException e){} }
 		
 
-		if(king.sideOfBoard == "Top" && y > 1) {
+		if(piece.sideOfBoard == "Top" && y > 1) {
 		try {
 			if((this.getSquare(x+1,y-1).getClass().getName().equals("chess.Pawn") && 
-				this.getSquare(x+1,y-1).side != king.side) || (this.getSquare(x-1, y-1).side != king.side
-				&&  this.getSquare(x-1,y-1).getClass().getName().equals("chess.Pawn")))
-					return true; 	
-		}catch(NullPointerException e){}}
+					this.getSquare(x+1,y-1).side != piece.side)) {
+					if(isKing){
+					lastPieceToCheck = this.getSquare(x+1, y-1);
+					return true;
+					}else {
+						if(!this.validateMove(this.getSquare(x+1, y-1),piece.getPosition(), false)) return true;	
+					}
+				} 
+				if((this.getSquare(x-1, y-1).side != piece.side &&  
+					this.getSquare(x-1,y-1).getClass().getName().equals("chess.Pawn"))) {
+					if(isKing){
+					lastPieceToCheck = this.getSquare(x-1, y-1);
+					return true;
+					}else {
+						if(!this.validateMove(this.getSquare(x-1, y-1),piece.getPosition(), false)) return true;	
+					}
+				}	
+		}catch(NullPointerException | ArrayIndexOutOfBoundsException e){}}
 		for(int a=x+1; a<=7; a++) {
 			if(this.isOccupied(a,y)) {
-				if(this.isHostilePiece("chess.Rook", a, y, king.side)) return true;
+				if(this.isHostilePiece("chess.Rook", a, y, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,y), piece.getPosition(), false))
+						return true;			
+				} 
 				else break;
 			}}
 		for(int a=x-1; a>=0; a--) {
 			if(this.isOccupied(a,y)) {
-				if(this.isHostilePiece("chess.Rook", a, y, king.side)) return true;
+				if(this.isHostilePiece("chess.Rook", a, y, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,y), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}}
 
 		for(int a=y+1; a<=7; a++) {
 			if(this.isOccupied(x,a)) {
-				if(this.isHostilePiece("chess.Rook", x, a, king.side)) return true;
+				if(this.isHostilePiece("chess.Rook", x, a, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(x,a), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}}
 		for(int a=y-1; a>=0; a--) {
 			if(this.isOccupied(x,a)) {
-				if(this.isHostilePiece("chess.Rook", x, a, king.side)) return true;
+				if(this.isHostilePiece("chess.Rook", x, a, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(x,a), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 				
 			}}
@@ -219,7 +291,10 @@ public class Board{
 		for(int a=x+1; a<=7; a++) {
 			if(b>7) break;
 			if(this.isOccupied(a,b)) {
-				if(this.isHostilePiece("chess.Bishop", a, b, king.side)) return true;
+				if(this.isHostilePiece("chess.Bishop", a, b, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,b), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}
 			b++; 			
@@ -229,7 +304,10 @@ public class Board{
 		for(int a=x-1; a>=0; a--) {
 			if(b>7) break;
 			if(this.isOccupied(a,b)) {
-				if(this.isHostilePiece("chess.Bishop", a, b, king.side)) return true;
+				if(this.isHostilePiece("chess.Bishop", a, b, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,b), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}
 			b++;
@@ -238,7 +316,10 @@ public class Board{
 		for(int a=x+1; a<=7; a++) {
 			if(b<0) break;
 			if(this.isOccupied(a,b)) {
-				if(this.isHostilePiece("chess.Bishop", a, b, king.side)) return true;
+				if(this.isHostilePiece("chess.Bishop", a, b, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,b), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}
 			b--; 
@@ -247,34 +328,67 @@ public class Board{
 		for(int a=x-1; a>=0; a--) {
 			if(b<0) break;
 			if(this.isOccupied(a,b)) {
-				if(this.isHostilePiece("chess.Bishop", a, b, king.side)) return true;
+				if(this.isHostilePiece("chess.Bishop", a, b, piece.side, isKing)) { checks++;
+					if(!isKing && !this.validateMove(this.getSquare(a,b), piece.getPosition(), false))
+						return true;
+				}
 				else break;
 			}
 			b--; 
 		}
-		//check knight check
-		
 		
 		for(int i=0; i<8; i++) {
 			if(x+xC[i] > 7 || y+yC[i] > 7 || x+xC[i] < 0 || y+yC[i] < 0) continue;
 			if(isOccupied(x+xC[i],y+yC[i])) { 	
-			if(this.isHostileKnight(x+xC[i],y+yC[i],king.side)) return true; 
-		}}		
+			if(this.isHostileKnight(x+xC[i],y+yC[i],piece.side, isKing)) { checks++;
+				if(!isKing && !this.validateMove(this.getSquare(x+xC[i],y+yC[i]), piece.getPosition(), false))
+					return true;
+			} 
+		}}	
+		
+		if(isKing) {
+		if(checks == 1) return true;
+		if(checks == 2) { this.inDoubleCheck = true; return true; }
+		return false;}
+		
+		return false;
+	}
+	public boolean canBlock(ArrayList<Vector> squares, String sideChecked) {
+		for(int a=0; a<8; a++) {
+			for(int b=0; b<8; b++) {
+				if(this.isOccupied(a,b)) {
+				if(this.getSquare(a,b).side == sideChecked && !(this.getSquare(a,b) instanceof King)) {
+					for(int c=0; c<squares.size(); c++) { 
+						if(this.validateMove(this.getSquare(a,b), squares.get(c), false) == true) return true;
+					}
+				}
+				}
+			}}
+		
 		return false;
 	}
 	
-	public boolean isHostilePiece(String type, int x, int y, String side) {
-		return (this.getSquare(x,y).getClass().getName().equals(type) || 
+	
+	
+	
+	public boolean isHostilePiece(String type, int x, int y, String side, boolean isKing) {
+		if((this.getSquare(x,y).getClass().getName().equals(type) || 
 				this.getSquare(x,y).getClass().getName().equals("chess.Queen")) &&
-			   !this.getSquare(x,y).side.equals(side);
+			   !this.getSquare(x,y).side.equals(side)) {
+			lastPieceToCheck = this.getSquare(x,y);
+			return true;
+		} return false;
 	}
 	public Piece getSquare(Vector v) {
 			return board[v.getX()][v.getY()];
 		}
 
-	public boolean isHostileKnight(int x, int y, String side){
-		return this.getSquare(x,y).getClass().getName().equals("chess.Knight") &&
-			   !this.getSquare(x,y).side.equals(side);
+	public boolean isHostileKnight(int x, int y, String side, boolean isKing){
+		if(this.getSquare(x,y).getClass().getName().equals("chess.Knight") &&
+			   !this.getSquare(x,y).side.equals(side)) {
+			lastPieceToCheck  = this.getSquare(x,y);
+			return true;
+		} return false;
 	}
 	
 	
@@ -287,11 +401,11 @@ public class Board{
 	}
 	
 	public void move(Piece piece, Vector place) {     
-		if((this.isOccupied(place) && this.getSquare(place).side == this.getSquare(piece.getPosition()).side) ||
-			(whoseTurn == 1 && piece.side == black) || (whoseTurn == -1 && piece.side == white))
+		if((this.isOccupied(place) && this.getSquare(place).side == piece.side) ||
+			(this.isATestBoard == false && (whoseTurn == 1 && piece.side == black) || (whoseTurn == -1 && piece.side == white)))
 			 return;
 		
-		 if(!isATestBoard) 
+		 if(!isATestBoard && moveCount > 0) 
 			 if(this.validateMove(piece, place, true)) return;
 		
 		 
@@ -301,14 +415,14 @@ public class Board{
 		 			case("Top"):{
 		 			 if(!(this.getSquare(7,7).hasMoved == false && this.getSquare(6,7) == null &&
 		 				  this.getSquare(5,7) == null)) return;
-		 			 this.castle((King)piece, (Rook)this.getSquare(7,7), true);
+		 			 this.castle(new Vector(7,7), true);
 		 			 break;
 		 			}
 		 			case("Bottom"):{ 
 			 		 if(!(this.getSquare(7,0).hasMoved == false && this.getSquare(6,0) == null &&
 				 		  this.getSquare(5,0) == null)) return;
 			 		 
-				 	 this.castle((King)piece, (Rook)this.getSquare(7,0), true);	
+				 	 this.castle(new Vector(7,0), true);	
 		 			 break;
 		 			}
 		 			
@@ -320,7 +434,7 @@ public class Board{
 		 			case("Top"):{
 			 		 if(!(this.getSquare(0,7).hasMoved == false && this.getSquare(1,7) == null &&
 				 		   this.getSquare(2,7) == null && this.getSquare(3,7) == null)) return;
-				 		   this.castle((King)piece, (Rook)this.getSquare(0,7), false);	
+				 		   this.castle(new Vector(0,7), false);	
 		 			 break;
 		 			}
 		 				
@@ -328,118 +442,213 @@ public class Board{
 		 			case("Bottom"):{
 				 	 if(!(this.getSquare(0,0).hasMoved == false && this.getSquare(1,0) == null &&
 						   this.getSquare(2,0) == null && this.getSquare(3,0) == null)) return;
-						   this.castle((King)piece, (Rook)this.getSquare(0,0), false);		
+						   this.castle(new Vector(0,0), false);		
 		 			 break;
 		 			}
 		 			
 		 			
 		 			}
 		 		}	
+		 		
 		 	}
 		 
 		 
 		 	if(piece.getClass().getName().equals("chess.Pawn")) { 
 		 		if(!Piece.isPawnCapture(place, piece.getPosition(), (Pawn)piece) && isOccupied(place))
 		 		{	
-///*HERE*/		 	System.out.println(piece.getPosition().getX() + "," + piece.getPosition().getY());
-//		 			System.out.println(place.getX() + "," + place.getY());
 		 			
 		 			
 		 			return;
 		 		}
 		 		if(Piece.isPawnCapture(place, piece.getPosition(), (Pawn)piece) && !isOccupied(place) &&
-		 				!Piece.isEnPossant(this, place)) return;
-			
-//			if(Piece.isPawnCapture(place, piece.getPosition(), (Pawn)piece) && isOccupied(place)) 
-//				this.updateScore();
+		 				!Piece.isEnPassant(this, place)) return;
 		
-			if(Piece.isEnPossant(this, place) && place.getX() == lastPieceEnd.getX() && 
+			if(Piece.isEnPassant(this, place) && place.getX() == lastPieceEnd.getX() && 
 				lastPieceEnd.getY() == piece.getPosition().getY()) {	
 					 this.updateScore();
 					 this.setSquare(null, lastPieceEnd);
 				}
 		 	}
-		if(isOccupied(place) /*&& !piece.getClass().getName().equals("chess.Pawn")*/){	
+		if(isOccupied(place)){	
 			 this.updateScore(); 
 		}	
 		
 			 String sideStale = "";
-			 if(moveCount>0) { System.out.println(lastPieceMoved.side); sideStale = lastPieceMoved.side;}
+			 if(moveCount>5) sideStale = lastPieceMoved.side;
 		   	 this.setSquare(null, piece.getPosition());
 			 this.setSquare(piece, place);
 			 this.endTurn(piece, place);
 
-			 if(inCheck==false && moveCount > 3) {
-				 if(this.isStalemate(true, sideStale)) {
+			 if(inCheck==false && moveCount >6) {
+				 if(this.isStalemate(sideStale)) {
 					 System.out.println("Stalemate!");
 					 System.exit(0);
-				 }
-			 }
- 
+				 }	}				
+			String sideCheck = "";
+//			if(lastPieceMoved.side == white) wasACheck = this.isInCheck((King)this.getSquare(blackKingPosition));
+//			if(lastPieceMoved.side == black) wasACheck = this.isInCheck((King)this.getSquare(whiteKingPosition));
+			
+			if(this.isATestBoard == false && inCheck == true) {
+				if(lastPieceMoved.side == white) sideCheck = black;
+				if(lastPieceMoved.side == black) sideCheck = white; 
+				if(this.isCheckmate(sideCheck)) {
+					System.out.println("Checkmate! " + lastPieceMoved.side + " wins !");
+					System.exit(0);
+				}
+			}
+			
+			 
 	}
-	public void castle(King king, Rook rook, boolean kingSide){
+	public void castle(Vector rookPos, boolean kingSide){
+//		System.out.println("were here" + this.isATestBoard);
 		int b = -2;
 		if(!kingSide)b +=5; 
-		this.setSquare(this.getSquare(rook.getPosition()), new Vector(rook.getPosition().getX()+b, rook.getPosition().getY()));
-		this.setSquare(null, rook.getPosition());
-		rook.getPosition().setX(rook.getPosition().getX() + b);	
+		this.setSquare(this.getSquare(rookPos), new Vector(rookPos.getX()+b, rookPos.getY()));
+		this.setSquare(null, rookPos);
+//		this.print(); rookPos.print();
+		this.getSquare(rookPos.getX()+b, rookPos.getY()).getPosition().setX(rookPos.getX() + b);	
 		
 	}
-	public boolean isStalemate(boolean halt, String sideToMove) {
+	public boolean isStalemate(String sideToMove) {
 		
 		for(int a=0; a<8; a++) {
-			for(int b=0; b<8; b++) {
-				if(this.isOccupied(a,b)) {
-				if(this.getSquare(a,b).side == sideToMove) {
+			for(int b=0; b<8; b++) { 
+				if(this.isOccupied(a,b)) { 
+				if(this.getSquare(a,b).side == sideToMove) { 
 					Vector pos = new Vector(a,b);
 					ArrayList<Vector>moveList = this.peripheralMoves(pos, this.getSquare(a,b).getClass().getName(), this.getSquare(a,b).sideOfBoard);
-					printList(moveList); System.out.println(a + "," + b);
 					for(int c=0; c<moveList.size(); c++){ 
-						if(this.isOccupied(a, b) && this.getSquare(a,b).side == sideToMove) {
-							if(this.validateMove(this.getSquare(a,b), moveList.get(c), false)) return false;}
+						if(this.isOccupied(a, b) && this.getSquare(a,b).side == sideToMove) { 
+							if(!this.validateMove(this.getSquare(a,b), moveList.get(c), true)) { 
+								return false;}
+							}
 					}
 				}}
 			}
 		}
 		return true;
 	}
-	public boolean isCheckmate(boolean checkmate, String sideInCheck) {
-		boolean isCheckmate = true;
+	public boolean isCheckmate(String sideInCheck) {
+		King kingInCheck = new King(1, 1, "", "", "");
+		if(sideInCheck == white) kingInCheck = (King)this.getSquare(whiteKingPosition);
+		if(sideInCheck == black) kingInCheck = (King)this.getSquare(blackKingPosition);
+		Vector kingPos = kingInCheck.getPosition();
+		ArrayList<Vector> kingMoves = this.peripheralMoves(kingPos, "chess.King", kingInCheck.sideOfBoard);
+		
+
+		//checks if any legal king moves
+		for(int a=0; a<kingMoves.size(); a++) { 
+			if(this.isOccupied(kingMoves.get(a))) {
+				if(this.getSquare(kingMoves.get(a)).side == sideInCheck) continue;
+			}
+			if(!this.validateMove(kingInCheck, kingMoves.get(a), true)) {return false;}
+		} 
+		//if no legal king moves and double check, checkmate
+		if(this.inDoubleCheck == true) return true;
+		
+		if(this.isInCheck(lastPieceToCheck)) return false;
+		
+		//if no legal king moves and piece is knight/pawn and cannot be captured legally, checkmate
+		if(lastPieceToCheck instanceof Knight || lastPieceToCheck instanceof Pawn) return true;
 		
 		
-		return isCheckmate;
+		if(this.canBlock(this.getBlockSquares(kingInCheck.getPosition(), lastPieceToCheck.getPosition()), sideInCheck) == true) return false;
+		
+
+		return true;
 	}
+	public ArrayList<Vector> getBlockSquares(Vector kingPos, Vector checkPos){
+		int x = kingPos.getX();
+		int y = kingPos.getY();
+		ArrayList<Vector> squares = new ArrayList<Vector>();
+		
+		find:{
+		for(int a=x+1; a<=7; a++) {
+			squares.add(new Vector(a,y));
+			if(checkPos.equals(new Vector(a,y))) break find;
+		}
+		squares.clear();
+		for(int a=x-1; a>=0; a--) {
+			squares.add(new Vector(a,y));
+			if(checkPos.equals(new Vector(a,y))) break find;
+		}
+		squares.clear();
+		for(int a=y+1; a<=7; a++) {
+			squares.add(new Vector(x,a));
+			if(checkPos.equals(new Vector(x,a))) break find;
+		}
+		squares.clear();
+
+		for(int a=y-1; a>=0; a--) {
+			squares.add(new Vector(x,a));
+			if(checkPos.equals(new Vector(x,a))) break find;
+		}
+		squares.clear();
+
+		int b=y+1;
+		for(int a=x+1; a<=7; a++) {
+			if(b>7) break;
+			squares.add(new Vector(a,b));
+			if(checkPos.equals(new Vector(a,b))) break find;
+			b++; 			
+			
+		}
+		squares.clear();
+		
+		b=y+1;
+		for(int a=x-1; a>=0; a--) {
+			if(b>7) break;
+			squares.add(new Vector(a,b));
+			if(checkPos.equals(new Vector(a,b))) break find;
+			b++;
+		}
+		squares.clear();
+		
+		b=y-1;
+		for(int a=x+1; a<=7; a++) {
+			if(b<0) break;
+			squares.add(new Vector(a,b));
+			if(checkPos.equals(new Vector(a,b))) break find;
+			b--; 
+		}
+		squares.clear();
+		
+		b=y-1;
+		for(int a=x-1; a>=0; a--) {
+			if(b<0) break;
+			squares.add(new Vector(a,b));
+			if(checkPos.equals(new Vector(a,b))) break find;
+			b--; 
+		}
+	}   squares.remove(squares.size()-1);
+		return squares;
+	}	
 	
 	public ArrayList<Vector> peripheralMoves(Vector pos, String type, String sideOfBoard){
 		ArrayList<Vector> moves = new ArrayList<Vector>();
 		int x = pos.getX(), y = pos.getY();
+		ArrayList<Vector> diagMoves = pos.getDiag();
+		ArrayList<Vector> hvMoves = pos.getHorzVert();
+
 		switch(type) {
 		case("chess.King"):{
-			for(int i=0; i<4; i++){
-				if(pos.getDiag().get(i).getX() > 7 || pos.getDiag().get(i).getX() < 0 ||
-				   pos.getDiag().get(i).getY() > 7 || pos.getDiag().get(i).getY() < 0) continue;
-				moves.add(pos.getDiag().get(i));
+			for(int i=0; i<diagMoves.size(); i++){
+				moves.add(diagMoves.get(i));
 			}
-			for(int i=0; i<4; i++){
-				if(pos.getHorzVert().get(i).getX() > 7 || pos.getHorzVert().get(i).getX() < 0 ||
-				   pos.getHorzVert().get(i).getY() > 7 || pos.getHorzVert().get(i).getY() < 0) continue;
-				moves.add(pos.getHorzVert().get(i));
-			}	
+			for(int i=0; i<hvMoves.size(); i++){
+				moves.add(hvMoves.get(i));
+			}
 			break;
 		}
 		case("chess.Rook"):{
-			for(int i=0; i<4; i++){
-				if(pos.getHorzVert().get(i).getX() > 7 || pos.getHorzVert().get(i).getX() < 0 ||
-				   pos.getHorzVert().get(i).getY() > 7 || pos.getHorzVert().get(i).getY() < 0) continue;
-				moves.add(pos.getHorzVert().get(i));
+			for(int i=0; i<hvMoves.size(); i++){
+				moves.add(hvMoves.get(i));
 			}
 			break;
 		}
 		case("chess.Bishop"):{
-			for(int i=0; i<4; i++){
-				if(pos.getDiag().get(i).getX() > 7 || pos.getDiag().get(i).getX() < 0 ||
-				   pos.getDiag().get(i).getY() > 7 || pos.getDiag().get(i).getY() < 0) continue;
-				moves.add(pos.getDiag().get(i));
+			for(int i=0; i<diagMoves.size(); i++){
+				moves.add(diagMoves.get(i));
 			}
 			break;
 		}
@@ -451,27 +660,29 @@ public class Board{
 			break;
 		}
 		case("chess.Queen"):{
-			for(int i=0; i<4; i++){
-				if(pos.getDiag().get(i).getX() > 7 || pos.getDiag().get(i).getX() < 0 ||
-				   pos.getDiag().get(i).getY() > 7 || pos.getDiag().get(i).getY() < 0) continue;
-				moves.add(pos.getDiag().get(i));
+			for(int i=0; i<diagMoves.size(); i++){
+				moves.add(diagMoves.get(i));
 			}
-			for(int i=0; i<4; i++){
-				if(pos.getHorzVert().get(i).getX() > 7 || pos.getHorzVert().get(i).getX() < 0 ||
-				   pos.getHorzVert().get(i).getY() > 7 || pos.getHorzVert().get(i).getY() < 0) continue;
-				moves.add(pos.getHorzVert().get(i));
+			for(int i=0; i<hvMoves.size(); i++){
+				moves.add(hvMoves.get(i));
 			}
 			break;
 		}
 		case("chess.Pawn"):{
 			if(sideOfBoard == "Bottom") {
-			moves.add(new Vector(pos.getX()-1, pos.getY()+1));
-			moves.add(new Vector(pos.getX(), pos.getY()+1));
-			moves.add(new Vector(pos.getX()+1, pos.getY()+1));}
+				if(pos.getX()>0 && pos.getY()<7)
+					moves.add(new Vector(pos.getX()-1, pos.getY()+1));
+				if(pos.getY()<7)
+					moves.add(new Vector(pos.getX(), pos.getY()+1));
+				if(pos.getX()<7 && pos.getY()<7)
+					moves.add(new Vector(pos.getX()+1, pos.getY()+1));}
 			else {
-			moves.add(new Vector(pos.getX()-1, pos.getY()-1));
-			moves.add(new Vector(pos.getX(), pos.getY()-1));
-			moves.add(new Vector(pos.getX()+1, pos.getY()-1));}
+				if(pos.getX()>0 && pos.getY()>0)
+					moves.add(new Vector(pos.getX()-1, pos.getY()-1));
+				if(pos.getY()>0)
+					moves.add(new Vector(pos.getX(), pos.getY()-1));
+				if(pos.getX()<7 && pos.getY()>0)
+					moves.add(new Vector(pos.getX()+1, pos.getY()-1));}
 			break;
 		}
 		}
