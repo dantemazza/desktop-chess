@@ -9,31 +9,63 @@ public class Vector {
     	this.x = x;
     	this.y = y;
     }
+    Vector(Vector vector){
+    	this.setX(vector.getX());
+    	this.setY(vector.getY());
+    }
     Vector(){}
-
+    
+    public boolean equals(Vector vector) {
+    	return this.getX() == vector.getX() && this.getY() == vector.getY();
+    }
     public void setVector(Vector vector) {
     	this.setX(vector.getX());
     	this.setY(vector.getY());
     }
     public ArrayList<Vector> getDiag(){
 		ArrayList<Vector> moves = new ArrayList<Vector>();
-		moves.add(new Vector(this.getX()+1, this.getY()-1));
-		moves.add(new Vector(this.getX()+1, this.getY()+1));
-		moves.add(new Vector(this.getX()-1, this.getY()-1));
-		moves.add(new Vector(this.getX()-1, this.getY()+1));
-
+		Vector v;
+		v = new Vector(this.getX()+1, this.getY()-1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX()+1, this.getY()+1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX()-1, this.getY()-1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX()-1, this.getY()+1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
 		return moves;
     }
+    public boolean checkInBounds() {
+    	return !(this.getX() > 7 || this.getX() < 0 ||
+		   this.getY() > 7 || this.getY() < 0);  
+    }    
+    
+    
     public ArrayList<Vector> getHorzVert(){
  		ArrayList<Vector> moves = new ArrayList<Vector>();
- 		moves.add(new Vector(this.getX(), this.getY()-1));
- 		moves.add(new Vector(this.getX(), this.getY()+1));
- 		moves.add(new Vector(this.getX()-1, this.getY()));
- 		moves.add(new Vector(this.getX()-1, this.getY()));
+		Vector v;
+		v = new Vector(this.getX(), this.getY()-1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX(), this.getY()+1);
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX()-1, this.getY());
+		if(v.checkInBounds() == true)
+		moves.add(v);
+		v = new Vector(this.getX()+1, this.getY());
+		if(v.checkInBounds() == true)
+		moves.add(v);	
 
  		return moves;
      } 
-    
+    public void print() {
+    	System.out.println(this.getX() + "," + this.getY());
+    }
     
     public int getX(){
         return x;
