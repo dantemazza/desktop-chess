@@ -60,7 +60,7 @@ public class Board{
 //		board[3][7] = new Bishop(3,7, "Bsp", "black", "Bottom");
 //		board[6][6] = new Queen(6,6, "Bsp", "white", "Bottom");
 	}
-	// conducts all end of turn procedures (variable, score update etc.)
+	// conducts all end of turn procedures 
 	public void endTurn(Piece piece, Vector place) {
 		if(piece.getClass().getName().equals("chess.King")) {
 			if(piece.side.equals(black)) { blackKingPosition.setVector(place);
@@ -147,7 +147,7 @@ public class Board{
 		return this.getSquare(x,y) != null;
 	}
 	
-	// creates a board sand box to see verify if a move is valid.
+	// creates a board sand box to verify if a move is valid
 	public boolean validateMove(Piece piece, Vector place, boolean isntChecker){
 		//returns true if invalid, false if valid
  		if(piece instanceof King) {
