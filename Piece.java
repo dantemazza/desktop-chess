@@ -56,8 +56,8 @@ public abstract class Piece implements Cloneable {
 	public static boolean isPawnCapture(Vector a, Vector b, Pawn p){
 
 		return ((Math.abs(a.getX()-b.getX())) == 1) &&
-				((p.sideOfBoard == "Bottom" && a.getY()-b.getY() == 1) || 
-				 (p.sideOfBoard == "Top" && a.getY()-b.getY() == -1));
+				((p.sideOfBoard == "Top" && a.getY()-b.getY() == 1) || 
+				 (p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -1));
 	}
 	public static boolean areHorzAdj(Piece p1, Piece p2) {
 		if(p1.Position.getX() - p2.Position.getX() == 1 && p1.Position.getY() == p2.Position.getY())
@@ -78,10 +78,10 @@ public abstract class Piece implements Cloneable {
 	
 	public static boolean isValidPawnMove(Vector a, Vector b, Pawn p) {
 		
-		boolean side2 = ((p.sideOfBoard == "Bottom" && a.getY()-b.getY() == 2) || 
-				(p.sideOfBoard == "Top" && a.getY()-b.getY() == -2)) && p.hasMoved == false;
-		boolean side1 =  (p.sideOfBoard == "Bottom" && a.getY()-b.getY() == 1) || 
-				(p.sideOfBoard == "Top" && a.getY()-b.getY() == -1);
+		boolean side2 = ((p.sideOfBoard == "Top" && a.getY()-b.getY() == 2) || 
+				(p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -2)) && p.hasMoved == false;
+		boolean side1 =  (p.sideOfBoard == "Top" && a.getY()-b.getY() == 1) || 
+				(p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -1);
 		return (side2 || side1) && (a.getX() == b.getX());
 			
 	}
