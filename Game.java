@@ -267,16 +267,16 @@ public class Game extends Application{
 		 for(int w=0; w<8; w++) {
 			 for(int z=0; z<8; z++) { 
 				 final int x = w, y = z;
-				 squares[x][y].setOnMouseClicked(e ->{	
+				 squares[x][y].setOnMouseClicked(e ->{	 System.out.println(x + "," + y);
 					 if(!gameBoard.isOccupied(x,y) && clicked == -1) return;
 						if(clicked == -1) {
 							lastClicked.setVector(x,y);
-//							System.out.println(x + "," + y);
+							
 						}
 						if(clicked == 1) { 
 							
 							gameBoard.getSquare(lastClicked).move(new Vector(x,y), gameBoard);
-						
+							
 								if(!gameBoard.wasMoveInvalid) {
 									if(moveKey != maxMoveKey) {
 //										if(maxMoveKey == 1 ) { storedBoards.remove(1); break key;}
