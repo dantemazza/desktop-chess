@@ -169,7 +169,7 @@ public abstract class Piece implements Cloneable {
 			if (isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)
 				|| isDiagonal(this.getPosition(), place) && isClearDiagPath(place, this.getPosition(), b)){
 				b.move(this, place);
-			}
+			}else {b.wasMoveInvalid = true;}
 		}}
 	class Rook extends Piece{
 
@@ -182,10 +182,10 @@ public abstract class Piece implements Cloneable {
 
 		@Override
 		void move(Vector place, Board b) {
-			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)) == true) 		
+			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)) == true) {		
 				b.move(this, place);
 				this.hasMoved = true;
-
+			}else {b.wasMoveInvalid = true;}
 		}}
 	class Bishop extends Piece{
 
@@ -201,7 +201,7 @@ public abstract class Piece implements Cloneable {
 			if(isDiagonal(this.getPosition(), place) && isClearDiagPath(place, this.getPosition(), b)) {
 				b.move(this, place);
 				this.setPosition(place);
-			}
+			}else {b.wasMoveInvalid = true;}
 			
 		}}
 	class King extends Piece{
@@ -220,7 +220,7 @@ public abstract class Piece implements Cloneable {
 				b.move(this, place);
 //				this.setPosition(place);
 				this.hasMoved = true;
-			}
+			}else {b.wasMoveInvalid = true;}
 			
 		}}
 	class Knight extends Piece{
@@ -237,7 +237,7 @@ public abstract class Piece implements Cloneable {
 			if(isL(this.getPosition(), place)) { 
 			b.move(this, place);
 //			this.setPosition(place);
-			}
+			}else {b.wasMoveInvalid = true;}
 		}} 
 	class Pawn extends Piece{
 
@@ -253,7 +253,7 @@ public abstract class Piece implements Cloneable {
 			b.move(this, place);	
 //			this.setPosition(place);
 			this.hasMoved = true;
-			}
+			}else {b.wasMoveInvalid = true;}
 		}}
 
 
