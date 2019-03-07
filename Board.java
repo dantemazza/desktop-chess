@@ -7,7 +7,7 @@ import java.util.ArrayList;
 	public boolean inCheck, inDoubleCheck, isATestBoard = false, wasACheck;
 	private int whiteScore, blackScore, moveCount=0;
 	private String capturedSide;
-	private int whoseTurn = 1; 
+	public int whoseTurn = 1; 
 	public Piece lastPieceMoved, lastPieceToCheck;
 	public Vector lastPieceStart = new Vector(), lastPieceEnd = new Vector();
 	public Vector whiteKingPosition, blackKingPosition;
@@ -233,7 +233,7 @@ import java.util.ArrayList;
 		}catch(NullPointerException | ArrayIndexOutOfBoundsException e){} }
 		
 
-		if(piece.sideOfBoard == "Bottom" && y > 1) { System.out.println("wher here");
+		if(piece.sideOfBoard == "Bottom" && y > 1) { 
 		try {
 			if((this.getSquare(x+1,y-1).getClass().getName().equals("chess.Pawn") && 
 					this.getSquare(x+1,y-1).side != piece.side)) {
