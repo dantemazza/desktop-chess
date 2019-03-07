@@ -16,31 +16,32 @@ public class Board{
 	public final String black = "black";
 	public final int xC[] = {1,2,2,1,-1,-2,-2,-1}; 
 	public final int yC[] = {2,1,-1,-2,-2,-1,1,2};
+	public boolean wasMoveInvalid = false;
 	Board(String topSide, String bottomSide){
-		board[0][0] = new Rook(0, 0, "Ra1", bottomSide, "Bottom");
-		board[1][0] = new Knight(1, 0, "Nb1", bottomSide, "Bottom");
-		board[2][0] = new Bishop(2, 0, "Bc1", bottomSide, "Bottom");
-		board[3][0] = new Queen(3, 0, "Qd1", bottomSide, "Bottom");			
-		board[4][0] = new King(4, 0, "Ke1", bottomSide, "Bottom");
-		board[5][0] = new Bishop(5, 0, "Bf1", bottomSide, "Bottom");
-		board[6][0] = new Knight(6, 0, "Ng1", bottomSide, "Bottom");
-		board[7][0] = new Rook(7, 0, "Rh1", bottomSide, "Bottom");
+		board[0][0] = new Rook(0, 0, "Ra1", topSide, "Bottom");
+		board[1][0] = new Knight(1, 0, "Nb1", topSide, "Bottom");
+		board[2][0] = new Bishop(2, 0, "Bc1", topSide, "Bottom");
+		board[3][0] = new Queen(3, 0, "Qd1", topSide, "Bottom");			
+		board[4][0] = new King(4, 0, "Ke1", topSide, "Bottom");
+		board[5][0] = new Bishop(5, 0, "Bf1", topSide, "Bottom");
+		board[6][0] = new Knight(6, 0, "Ng1", topSide, "Bottom");
+		board[7][0] = new Rook(7, 0, "Rh1", topSide, "Bottom");
 		for(int a=0; a<8; a++) {
-			board[a][1] = new Pawn(a, 1, "P" + letters + 2, bottomSide, "Bottom");
+			board[a][1] = new Pawn(a, 1, "P" + letters + 2, topSide, "Bottom");
 			letters++;
 		}
 		
 		letters = 'a';
-		board[0][7] = new Rook(0, 7, "Ra8", topSide, "Top");
-		board[1][7] = new Knight(1, 7, "Nb8", topSide, "Top");
-		board[2][7] = new Bishop(2, 7, "Bc8", topSide, "Top");
-		board[3][7] = new Queen(3, 7, "Qd8", topSide, "Top");			
-		board[4][7] = new King(4, 7, "Ke8", topSide, "Top");
-		board[5][7] = new Bishop(5, 7, "Bf8", topSide, "Top");
-		board[6][7] = new Knight(6, 7, "Ng8", topSide, "Top");
-		board[7][7] = new Rook(7, 7, "Rh8", topSide, "Top");		
+		board[0][7] = new Rook(0, 7, "Ra8", bottomSide, "Top");
+		board[1][7] = new Knight(1, 7, "Nb8", bottomSide, "Top");
+		board[2][7] = new Bishop(2, 7, "Bc8", bottomSide, "Top");
+		board[3][7] = new Queen(3, 7, "Qd8", bottomSide, "Top");			
+		board[4][7] = new King(4, 7, "Ke8", bottomSide, "Top");
+		board[5][7] = new Bishop(5, 7, "Bf8", bottomSide, "Top");
+		board[6][7] = new Knight(6, 7, "Ng8", bottomSide, "Top");
+		board[7][7] = new Rook(7, 7, "Rh8", bottomSide, "Top");		
 		for(int a=0; a<8; a++) {
-			board[a][6] = new Pawn(a, 6, "P" + letters + 7, topSide, "Top");
+			board[a][6] = new Pawn(a, 6, "P" + letters + 7, bottomSide, "Top");
 			letters++;
 		}
 		if(board[4][0].side.equals(white)) { 
@@ -60,7 +61,7 @@ public class Board{
 //		board[3][7] = new Bishop(3,7, "Bsp", "black", "Bottom");
 //		board[6][6] = new Queen(6,6, "Bsp", "white", "Bottom");
 	}
-	// conducts all end of turn procedures 
+	// conducts all end of turn procedures (variable, score update etc.)
 	public void endTurn(Piece piece, Vector place) {
 		if(piece.getClass().getName().equals("chess.King")) {
 			if(piece.side.equals(black)) { blackKingPosition.setVector(place);
@@ -107,6 +108,8 @@ public class Board{
 		boardClone.whiteScore = c.whiteScore;
 		boardClone.blackScore = c.blackScore;
 		boardClone.whoseTurn = c.whoseTurn;
+		boardClone.moveCount = c.getMoveCount();
+		if(moveCount !=0) {
 		try {
 			boardClone.lastPieceMoved = (Piece) c.lastPieceMoved.clone();
 		} catch (CloneNotSupportedException e) {
@@ -115,6 +118,7 @@ public class Board{
 		}
 		boardClone.lastPieceStart.setVector(c.lastPieceStart);
 		boardClone.lastPieceEnd.setVector(c.lastPieceEnd);
+		}
 		boardClone.whiteKingPosition = new Vector(c.whiteKingPosition);
 		
 		boardClone.blackKingPosition = new Vector(c.blackKingPosition);
@@ -147,7 +151,7 @@ public class Board{
 		return this.getSquare(x,y) != null;
 	}
 	
-	// creates a board sand box to verify if a move is valid
+	// creates a board sand box to see verify if a move is valid.
 	public boolean validateMove(Piece piece, Vector place, boolean isntChecker){
 		//returns true if invalid, false if valid
  		if(piece instanceof King) {
@@ -165,7 +169,7 @@ public class Board{
 		 testCheck = clone(this);
 		 testCheck.isATestBoard = true;
 		 testCheck.getSquare(piece.getPosition()).move(place, testCheck);
-		 
+		 if(testCheck.getSquare(piece.getPosition()) != null) return true;
 		 /*adjusts "whoseTurn" in case it is not the players turn but we would still like to test moves for them
 		  */
 		 if(isntChecker)
@@ -359,7 +363,9 @@ public class Board{
 				if(this.isOccupied(a,b)) {
 				if(this.getSquare(a,b).side == sideChecked && !(this.getSquare(a,b) instanceof King)) {
 					for(int c=0; c<squares.size(); c++) { 
-						if(this.validateMove(this.getSquare(a,b), squares.get(c), false) == true) return true;
+						if(!this.validateMove(this.getSquare(a,b), squares.get(c), false)) {
+
+							return true;}
 					}
 				}
 				}
@@ -405,12 +411,13 @@ public class Board{
 			(this.isATestBoard == false && (whoseTurn == 1 && piece.side == black) || (whoseTurn == -1 && piece.side == white)))
 			 return;
 		
-		 if(!isATestBoard && moveCount > 0) 
-			 if(this.validateMove(piece, place, true)) return;
-		
+		 if(!isATestBoard && moveCount >= 0) {
+			 this.wasMoveInvalid = this.validateMove(piece, place, true);
+			 if(wasMoveInvalid) return;
+		 }
 		 
 		 	if(piece.getClass().getName().equals("chess.King")) { 
-				if(inCheck && Math.abs(piece.getPosition().getX()-place.getX()) == 2) return;
+		 		if(inCheck && Math.abs(piece.getPosition().getX()-place.getX()) == 2) return;
 		 		if((piece.getPosition().getX() - place.getX()) == -2) { 
 		 			switch(piece.sideOfBoard) {
 		 			case("Top"):{
@@ -480,7 +487,7 @@ public class Board{
 			 this.setSquare(piece, place);
 			 this.endTurn(piece, place);
 
-			 if(inCheck==false && moveCount >6) {
+			 if(inCheck==false && moveCount > 6 && !this.isATestBoard) {
 				 if(this.isStalemate(sideStale)) {
 					 System.out.println("Stalemate!");
 					 System.exit(0);
@@ -489,12 +496,12 @@ public class Board{
 //			if(lastPieceMoved.side == white) wasACheck = this.isInCheck((King)this.getSquare(blackKingPosition));
 //			if(lastPieceMoved.side == black) wasACheck = this.isInCheck((King)this.getSquare(whiteKingPosition));
 			
-			if(this.isATestBoard == false && inCheck == true) {
+			if(!this.isATestBoard && inCheck == true) {
 				if(lastPieceMoved.side == white) sideCheck = black;
 				if(lastPieceMoved.side == black) sideCheck = white; 
 				if(this.isCheckmate(sideCheck)) {
 					System.out.println("Checkmate! " + lastPieceMoved.side + " wins !");
-					System.exit(0);
+//					System.exit(0);
 				}
 			}
 			
@@ -513,7 +520,7 @@ public class Board{
 	public boolean isStalemate(String sideToMove) {
 		
 		for(int a=0; a<8; a++) {
-			for(int b=0; b<8; b++) { 
+			for(int b=0; b<8; b++) { System.out.println(a + "," + b);
 				if(this.isOccupied(a,b)) { 
 				if(this.getSquare(a,b).side == sideToMove) { 
 					Vector pos = new Vector(a,b);
@@ -552,9 +559,9 @@ public class Board{
 		//if no legal king moves and piece is knight/pawn and cannot be captured legally, checkmate
 		if(lastPieceToCheck instanceof Knight || lastPieceToCheck instanceof Pawn) return true;
 		
-		
 		if(this.canBlock(this.getBlockSquares(kingInCheck.getPosition(), lastPieceToCheck.getPosition()), sideInCheck) == true) return false;
-		
+		System.out.println("here");
+
 
 		return true;
 	}
