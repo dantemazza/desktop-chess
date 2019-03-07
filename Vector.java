@@ -22,6 +22,11 @@ public class Vector {
     	this.setX(vector.getX());
     	this.setY(vector.getY());
     }
+    
+    public void setVector(int x, int y) {
+    	this.x = x;
+    	this.y = y;
+    }
     public ArrayList<Vector> getDiag(){
 		ArrayList<Vector> moves = new ArrayList<Vector>();
 		Vector v;
