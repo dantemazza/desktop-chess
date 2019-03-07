@@ -1,8 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
-//make isInCheck method apply to all piece
-public class Board{
+	public class Board{
 	private Piece board[][] = new Piece[8][8];
 	char letters = 'a';
 	public boolean inCheck, inDoubleCheck, isATestBoard = false, wasACheck;
@@ -18,30 +17,30 @@ public class Board{
 	public final int yC[] = {2,1,-1,-2,-2,-1,1,2};
 	public boolean wasMoveInvalid = false;
 	Board(String topSide, String bottomSide){
-		board[0][0] = new Rook(0, 0, "Ra1", topSide, "Bottom");
-		board[1][0] = new Knight(1, 0, "Nb1", topSide, "Bottom");
-		board[2][0] = new Bishop(2, 0, "Bc1", topSide, "Bottom");
-		board[3][0] = new Queen(3, 0, "Qd1", topSide, "Bottom");			
-		board[4][0] = new King(4, 0, "Ke1", topSide, "Bottom");
-		board[5][0] = new Bishop(5, 0, "Bf1", topSide, "Bottom");
-		board[6][0] = new Knight(6, 0, "Ng1", topSide, "Bottom");
-		board[7][0] = new Rook(7, 0, "Rh1", topSide, "Bottom");
+		board[0][0] = new Rook(0, 0, "Ra1", topSide, "Top");
+		board[1][0] = new Knight(1, 0, "Nb1", topSide, "Top");
+		board[2][0] = new Bishop(2, 0, "Bc1", topSide, "Top");
+		board[3][0] = new Queen(3, 0, "Qd1", topSide, "Top");			
+		board[4][0] = new King(4, 0, "Ke1", topSide, "Top");
+		board[5][0] = new Bishop(5, 0, "Bf1", topSide, "Top");
+		board[6][0] = new Knight(6, 0, "Ng1", topSide, "Top");
+		board[7][0] = new Rook(7, 0, "Rh1", topSide, "Top");
 		for(int a=0; a<8; a++) {
-			board[a][1] = new Pawn(a, 1, "P" + letters + 2, topSide, "Bottom");
+			board[a][1] = new Pawn(a, 1, "P" + letters + 2, topSide, "Top");
 			letters++;
 		}
 		
 		letters = 'a';
-		board[0][7] = new Rook(0, 7, "Ra8", bottomSide, "Top");
-		board[1][7] = new Knight(1, 7, "Nb8", bottomSide, "Top");
-		board[2][7] = new Bishop(2, 7, "Bc8", bottomSide, "Top");
-		board[3][7] = new Queen(3, 7, "Qd8", bottomSide, "Top");			
-		board[4][7] = new King(4, 7, "Ke8", bottomSide, "Top");
-		board[5][7] = new Bishop(5, 7, "Bf8", bottomSide, "Top");
-		board[6][7] = new Knight(6, 7, "Ng8", bottomSide, "Top");
-		board[7][7] = new Rook(7, 7, "Rh8", bottomSide, "Top");		
+		board[0][7] = new Rook(0, 7, "Ra8", bottomSide, "Bottom");
+		board[1][7] = new Knight(1, 7, "Nb8", bottomSide, "Bottom");
+		board[2][7] = new Bishop(2, 7, "Bc8", bottomSide, "Bottom");
+		board[3][7] = new Queen(3, 7, "Qd8", bottomSide, "Bottom");			
+		board[4][7] = new King(4, 7, "Ke8", bottomSide, "Bottom");
+		board[5][7] = new Bishop(5, 7, "Bf8", bottomSide, "Bottom");
+		board[6][7] = new Knight(6, 7, "Ng8", bottomSide, "Bottom");
+		board[7][7] = new Rook(7, 7, "Rh8", bottomSide, "Bottom");		
 		for(int a=0; a<8; a++) {
-			board[a][6] = new Pawn(a, 6, "P" + letters + 7, bottomSide, "Top");
+			board[a][6] = new Pawn(a, 6, "P" + letters + 7, bottomSide, "Bottom");
 			letters++;
 		}
 		if(board[4][0].side.equals(white)) { 
@@ -182,7 +181,6 @@ public class Board{
 			 
 		 }
 		 case(-1):{
-
 			 return testCheck.isInCheck((King)testCheck.getSquare(testCheck.blackKingPosition));
 			 
 	 
@@ -206,12 +204,12 @@ public class Board{
 	/* this method is  adjusted to apply to any piece input. In the context of a non-king parameter, 
 	   the method is used to determine if a piece delivering the only check to a king can be captured 
 	   by the checked side legally. */
-	public boolean isInCheck(Piece piece) {
+	public boolean isInCheck(Piece piece) {  
 		int checks = 0;
 		int y = piece.getPosition().getY();
 		int x = piece.getPosition().getX();
 		boolean isKing = piece instanceof King;
-		if(piece.sideOfBoard == "Bottom" && y < 6) {
+		if(piece.sideOfBoard == "Top" && y < 6) {
 		try {
 			if((this.getSquare(x+1,y+1).getClass().getName().equals("chess.Pawn") && 
 				this.getSquare(x+1,y+1).side != piece.side)) {
@@ -235,11 +233,11 @@ public class Board{
 		}catch(NullPointerException | ArrayIndexOutOfBoundsException e){} }
 		
 
-		if(piece.sideOfBoard == "Top" && y > 1) {
+		if(piece.sideOfBoard == "Bottom" && y > 1) { System.out.println("wher here");
 		try {
 			if((this.getSquare(x+1,y-1).getClass().getName().equals("chess.Pawn") && 
 					this.getSquare(x+1,y-1).side != piece.side)) {
-					if(isKing){
+					if(isKing){ 
 					lastPieceToCheck = this.getSquare(x+1, y-1);
 					return true;
 					}else {
@@ -248,7 +246,7 @@ public class Board{
 				} 
 				if((this.getSquare(x-1, y-1).side != piece.side &&  
 					this.getSquare(x-1,y-1).getClass().getName().equals("chess.Pawn"))) {
-					if(isKing){
+					if(isKing){ 
 					lastPieceToCheck = this.getSquare(x-1, y-1);
 					return true;
 					}else {
@@ -520,7 +518,7 @@ public class Board{
 	public boolean isStalemate(String sideToMove) {
 		
 		for(int a=0; a<8; a++) {
-			for(int b=0; b<8; b++) { System.out.println(a + "," + b);
+			for(int b=0; b<8; b++) { 
 				if(this.isOccupied(a,b)) { 
 				if(this.getSquare(a,b).side == sideToMove) { 
 					Vector pos = new Vector(a,b);
@@ -549,7 +547,7 @@ public class Board{
 			if(this.isOccupied(kingMoves.get(a))) {
 				if(this.getSquare(kingMoves.get(a)).side == sideInCheck) continue;
 			}
-			if(!this.validateMove(kingInCheck, kingMoves.get(a), true)) {return false;}
+			if(!this.validateMove(kingInCheck, kingMoves.get(a), true)) { return false; }
 		} 
 		//if no legal king moves and double check, checkmate
 		if(this.inDoubleCheck == true) return true;
