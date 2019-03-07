@@ -268,10 +268,13 @@ public class Game extends Application{
 			 for(int z=0; z<8; z++) { 
 				 final int x = w, y = z;
 				 squares[x][y].setOnMouseClicked(e ->{	 System.out.println(x + "," + y);
-					 if(!gameBoard.isOccupied(x,y) && clicked == -1) return;
+						
+
 						if(clicked == -1) {
-							lastClicked.setVector(x,y);
-							
+							if(!gameBoard.isOccupied(x,y)) return;
+					 		if(gameBoard.whoseTurn == -1 && gameBoard.getSquare(x,y).side.equals(white)) return;
+					 		if(gameBoard.whoseTurn == 1 && gameBoard.getSquare(x,y).side.equals(black)) return;
+					 		lastClicked.setVector(x,y);
 						}
 						if(clicked == 1) { 
 							
