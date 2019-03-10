@@ -19,16 +19,13 @@ public abstract class Piece implements Cloneable {
 		return super.clone();
 	}
 	
-	
 	abstract void move(Vector place, Board b);
 	
 	public Vector getPosition() {
 		return this.Position;
 	}
 	
-	
 	public void setPosition(Vector newPosition) {
-//		System.out.println(newPosition.getX() + "," + newPosition.getY());
 		this.Position = newPosition;
 	}
 	
@@ -121,7 +118,6 @@ public abstract class Piece implements Cloneable {
 			if(a.getX() < b.getX() && a.getY() > b.getY()) {
 				j = b.getX() - 1;
 			for(int i=b.getY()+1; i<a.getY(); i++){
-//				System.out.println("i: " + i + " j: " + j);
 				
 				if(c.isOccupied(new Vector(j,i))) return false;
 				j--;
@@ -129,7 +125,6 @@ public abstract class Piece implements Cloneable {
 			if(a.getX() > b.getX() && a.getY() > b.getY()) {
 				j = b.getX() + 1;
 			for(int i=b.getY()+1; i<a.getY(); i++){
-//				System.out.println("i: " + i + " j: " + j);
 				
 				if(c.isOccupied(new Vector(j,i))) return false;
 				j++;
@@ -137,7 +132,6 @@ public abstract class Piece implements Cloneable {
 			if(a.getX() < b.getX() && a.getY() < b.getY()) {
 				j = b.getX() - 1;
 			for(int i=b.getY()-1; i>a.getY(); i--){
-//				System.out.println("i: " + i + " j: " + j);
 				
 				if(c.isOccupied(new Vector(j,i))) return false;
 				j--;
@@ -157,7 +151,6 @@ public abstract class Piece implements Cloneable {
 	}
 
 	class Queen extends Piece{
-		
 		Queen(int x, int y, String name, String side, String sideOfBoard) {
 			super(x, y, name, side, sideOfBoard);
 			this.score = 9;
@@ -172,9 +165,6 @@ public abstract class Piece implements Cloneable {
 			}else {b.wasMoveInvalid = true;}
 		}}
 	class Rook extends Piece{
-
-			
-
 		Rook(int x, int y, String name, String side, String sideOfBoard) {
 			super(x, y, name, side, sideOfBoard);
 			this.score = 5;
@@ -184,13 +174,9 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)) == true) {		
 				b.move(this, place);
-				this.hasMoved = true;
 			}else {b.wasMoveInvalid = true;}
 		}}
 	class Bishop extends Piece{
-
-
-
 		Bishop(int x, int y, String name, String side, String sideOfBoard) {
 			super(x, y, name, side, sideOfBoard);
 			this.score = 3;
@@ -200,14 +186,10 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if(isDiagonal(this.getPosition(), place) && isClearDiagPath(place, this.getPosition(), b)) {
 				b.move(this, place);
-				this.setPosition(place);
 			}else {b.wasMoveInvalid = true;}
 			
 		}}
 	class King extends Piece{
-
-
-
 		King(int x, int y, String name, String side, String sideOfBoard) {
 			super(x, y, name, side, sideOfBoard);
 		}
@@ -218,15 +200,11 @@ public abstract class Piece implements Cloneable {
 			if(isOneAway(this.getPosition(), place) || (Math.abs(this.getPosition().getX() - place.getX()) == 2) &&
 					this.hasMoved ==false) {
 				b.move(this, place);
-//				this.setPosition(place);
-				this.hasMoved = true;
+				
 			}else {b.wasMoveInvalid = true;}
 			
 		}}
 	class Knight extends Piece{
-
-
-
 		Knight(int x, int y, String name, String side, String sideOfBoard) {
 			super(x, y, name, side, sideOfBoard);
 			this.score = 3;
@@ -236,7 +214,6 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if(isL(this.getPosition(), place)) { 
 			b.move(this, place);
-//			this.setPosition(place);
 			}else {b.wasMoveInvalid = true;}
 		}} 
 	class Pawn extends Piece{
@@ -251,8 +228,7 @@ public abstract class Piece implements Cloneable {
 			if(isValidPawnMove(place, this.getPosition(), this) ||
 					isPawnCapture(place, this.getPosition(), this)) {
 			b.move(this, place);	
-//			this.setPosition(place);
-			this.hasMoved = true;
+			
 			}else {b.wasMoveInvalid = true;}
 		}}
 
