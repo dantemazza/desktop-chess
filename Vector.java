@@ -49,6 +49,9 @@ public class Vector {
 		   this.getY() > 7 || this.getY() < 0);  
     }    
     
+    public boolean equals(int x, int y){
+    	return this.x == x && this.y == y;
+    }
     
     public ArrayList<Vector> getHorzVert(){
  		ArrayList<Vector> moves = new ArrayList<Vector>();
