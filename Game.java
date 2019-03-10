@@ -44,7 +44,7 @@ public class Game extends Application{
 		Scene scene = new Scene(pane, 900, 690, Color.GREEN);
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Yes");
+		primaryStage.setTitle("Chess");
 		primaryStage.setResizable(false);
 		primaryStage.show();
 		
