@@ -21,8 +21,8 @@ public class Game extends Application{
 
 	Label moveLabel = new Label();
 	Vector lastClicked = new Vector();
-	Image leftArrow = new Image("file:resources/left_arrow.png");
-	Image rightArrow = new Image("file:resources/right_arrow.png");
+	Image leftArrow = new Image("/left_arrow.png");
+	Image rightArrow = new Image("/right_arrow.png");
 	ArrayList<Board> storedBoards = new ArrayList<Board>();
 	ArrayList<String> storedMoves = new ArrayList<String>();
 	int moveKey = 0, maxMoveKey = 0, side = 1;
@@ -189,6 +189,9 @@ public class Game extends Application{
 			 bottom.getChildren().add(let); 
 			 } 
 		 }
+		 
+		 
+		 
 		 pane.setBottom(bottom);
 }
 	 
@@ -205,74 +208,74 @@ public class Game extends Application{
 					ImageView pieces;
 					if(piece.side.equals(white)) {
 					if(piece instanceof Pawn) {
-					pieces = new ImageView("file:resources/pawn_white.png");
+					pieces = new ImageView("/pawn_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);	
 					}
 					if(piece instanceof King) {
-				    pieces = new ImageView("file:resources/king_white.png");
+				    pieces = new ImageView("/king_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Rook) {
-					pieces = new ImageView("file:resources/rook_white.png");
+					pieces = new ImageView("/rook_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);						
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Knight) {
-				    pieces = new ImageView("file:resources/knight_white.png");
+				    pieces = new ImageView("/knight_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Bishop) {
-					pieces = new ImageView("file:resources/bishop_white.png");
+					pieces = new ImageView("/bishop_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Queen) {
-					pieces = new ImageView("file:resources/queen_white.png");
+					pieces = new ImageView("/queen_white.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);	
 					}}
 					if(piece.side.equals(black)) { 
 					if(piece instanceof Pawn) {
-					pieces = new ImageView("file:resources/pawn_black.png");
+					pieces = new ImageView("/pawn_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof King) {
-					pieces = new ImageView("file:resources/king_black.png");
+					pieces = new ImageView("/king_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Rook) {
-					pieces = new ImageView("file:resources/rook_black.png");
+					pieces = new ImageView("/rook_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Knight) {
-					pieces = new ImageView("file:resources/knight_black.png");
+					pieces = new ImageView("/knight_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Bishop) {
-					pieces = new ImageView("file:resources/bishop_black.png");
+					pieces = new ImageView("/bishop_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
 					}
 					if(piece instanceof Queen) {
-					pieces = new ImageView("file:resources/queen_black.png");
+					pieces = new ImageView("/queen_black.png");
 					pieces.setFitHeight(80);
 					pieces.setFitWidth(80);
 					squares[a][d].setGraphic(pieces);
