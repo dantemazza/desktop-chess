@@ -1,64 +1,47 @@
 package chess;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
 import javafx.application.Application;
-import javafx.event.*;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.*;
 import javafx.scene.paint.*;
 import javafx.stage.*;
-import javafx.scene.paint.*;
-import javafx.scene.control.Label.*;
 import javafx.scene.image.*;
-import javafx.scene.text.*;
-import javafx.scene.input.*;
 
 public class Game extends Application{
 	 final String white = "white";
 	 final String black = "black";
 	int clicked = -1;
 	Label squares[][] = new Label[8][8];
-	Board gameBoard = new Board(black,white);
+	Board gameBoard;
 	BorderPane pane = new BorderPane();
-	HBox top = new HBox();
-	HBox bottom = new HBox();	
-	VBox left = new VBox();
-	VBox right = new VBox();
 	String topSide, bottomSide;
-	ScrollPane moveScroller = new ScrollPane();
+
 	Label moveLabel = new Label();
 	Vector lastClicked = new Vector();
 	Image leftArrow = new Image("file:resources/left_arrow.png");
 	Image rightArrow = new Image("file:resources/right_arrow.png");
 	ArrayList<Board> storedBoards = new ArrayList<Board>();
-	int moveKey = 0, maxMoveKey = 0;
-	boolean moveKeyAddOne = true;
+	ArrayList<String> storedMoves = new ArrayList<String>();
+	int moveKey = 0, maxMoveKey = 0, side = 1;
 	
 	public void start(Stage primaryStage) throws Exception{
+		gameBoard = new Board(black, white);
 		storedBoards.add(gameBoard.clone(gameBoard));
-		Button button = new Button("Change Side");
-		Button exit = new Button("Exit");
-		button.setOnAction(e ->{ 
-			System.out.println("Hello World!");
-			System.out.println("Oh Yeah!");
-		});
-		
-		top.getChildren().addAll(button, exit);
-		exit.setOnAction(e -> System.exit(0));
-		pane.setStyle("-fx-background-color: #98ff98;");
-		pane.setTop(top);
-		this.setBoard(black,white);
+
+		pane.setStyle("-fx-background-color: #e1c699;");
+
+		this.setBoard(black, white);
 		this.updateImageBoard(gameBoard);
 		this.addEventsToBoard();
 		
 		this.setLeft();
 		this.setRight();
-		
+		this.setTop();
 		this.setBottom();
-		Scene scene = new Scene(pane, 900, 695, Color.GREEN);
+		Scene scene = new Scene(pane, 900, 690, Color.GREEN);
 		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Yes");
@@ -66,10 +49,8 @@ public class Game extends Application{
 		primaryStage.show();
 		
 	}
-	
-	
-
 	 public static void main(String args[]) {
+		 
 		 launch(args);}
 	 
 	 
@@ -87,17 +68,17 @@ public class Game extends Application{
 				 squares[a][b].setMinSize(80, 80);
 				 
 				 
-//				 squares[a][b].setText(Integer.toString(a) + " " + Integer.toString(b));
 				 if(c == -1) squares[a][b].setStyle("-fx-background-color: #f5f5dc;");
 				 if(c == 1)  squares[a][b].setStyle("-fx-background-color: #add8e6;");
 				 board.add(squares[a][b], a, b);
 				 c*= -1; 
 			 }
 		 }
-
 		 pane.setCenter(board);
+		 
 	 }
 	 public void setLeft() {
+		VBox left = new VBox();
 		 if(topSide == white) {
 			 for(int a=1; a<9; a++) {
 				 Label num = new Label("  " + Integer.toString(a) + " ");
@@ -113,11 +94,12 @@ public class Game extends Application{
 		 } pane.setLeft(left);
 	 }
 	 public void setRight() {
+		VBox right = new VBox();
+		ScrollPane moveScroller = new ScrollPane();
 		moveScroller.setMinSize(200, 500);
 		
 		moveLabel.setMinSize(100,20000);
 		moveLabel.setAlignment(Pos.TOP_LEFT);
-		moveLabel.setText("console under construction");
 		moveScroller.setContent(moveLabel);
 		right.getChildren().add(moveScroller);
 		right.setPadding(new Insets(17,17,17,17));
@@ -132,11 +114,10 @@ public class Game extends Application{
 		
 		undo.setOnMouseClicked(e ->{
 			if(moveKey == 0) return;
-			System.out.println("inleft " + moveKey);
 			gameBoard = storedBoards.get(moveKey-1).clone(storedBoards.get(moveKey-1));
+			this.printMoves(storedMoves.subList(0,moveKey-1));
 			moveKey--; 
 			this.updateImageBoard(gameBoard);
-//			moveKeyAddOne = true;
 		});
 		
 		
@@ -147,13 +128,10 @@ public class Game extends Application{
 	
 		redo.setOnMouseClicked(e ->{
 			if(moveKey == maxMoveKey) return;
-			System.out.println("inright " + moveKey);
-
-//			if(moveKeyAddOne == true)moveKey++;
 			moveKey++;
+			this.printMoves(storedMoves.subList(0,moveKey));
 			gameBoard = storedBoards.get(moveKey).clone(storedBoards.get(moveKey));
 			this.updateImageBoard(gameBoard);
-//			moveKeyAddOne = false;
 		});
 		
 		
@@ -163,17 +141,55 @@ public class Game extends Application{
 		right.getChildren().add(forback);
 		pane.setRight(right);  
 	 }
-	 
+	 public void setTop() {
+			HBox top = new HBox();
+			Button changeSide = new Button("Change Side");
+			Button exit = new Button("Exit");
+			changeSide.setOnAction(e ->{ 
+				side *= -1;
+				storedBoards.clear();
+				storedMoves.clear();
+				pane.setLeft(null);
+				pane.setBottom(null);
+				pane.setCenter(null);
+				pane.setRight(null);
+				moveLabel.setText(" ");
+				if(side == -1) { gameBoard = new Board(white,black);
+				this.setBoard(white, black); }
+				if(side == 1) { gameBoard = new Board(black, white); 
+				this.setBoard(black, white);}
+				this.addEventsToBoard();
+				this.updateImageBoard(gameBoard);
+				this.setRight();
+				this.setLeft();
+				this.setBottom();	
+				storedBoards.add(gameBoard.clone(gameBoard));
+				moveKey = 0; maxMoveKey = 0;
+			});
+			
+			top.getChildren().addAll(changeSide, exit);
+			exit.setOnAction(e -> System.exit(0));
+			pane.setTop(top);
+	 }
 	 
 	 public void setBottom() {
+		 HBox bottom = new HBox();	
 		 Label blfill = new Label();
 		 blfill.setMinSize(50, 9);
 		 bottom.getChildren().add(blfill);
+		 if(topSide.equals(black)) {
 		 for(char a = 'a'; a<'i'; a++) {
 			 Label let = new Label(Character.toString(a));
 			 let.setMinSize(80, 15);
 			 bottom.getChildren().add(let); 
-	 } pane.setBottom(bottom);
+		 }}else {
+		for(char b = 'h'; b>='a'; b--) {
+			 Label let = new Label(Character.toString(b));
+			 let.setMinSize(80, 15);
+			 bottom.getChildren().add(let); 
+			 } 
+		 }
+		 pane.setBottom(bottom);
 }
 	 
 	 public void updateImageBoard(Board board) {
@@ -267,8 +283,8 @@ public class Game extends Application{
 		 for(int w=0; w<8; w++) {
 			 for(int z=0; z<8; z++) { 
 				 final int x = w, y = z;
-				 squares[x][y].setOnMouseClicked(e ->{	 System.out.println(x + "," + y);
-						
+				 squares[x][y].setOnMouseClicked(e ->{	
+						if(gameBoard.checkMate) return;
 
 						if(clicked == -1) {
 							if(!gameBoard.isOccupied(x,y)) return;
@@ -277,37 +293,49 @@ public class Game extends Application{
 					 		lastClicked.setVector(x,y);
 						}
 						if(clicked == 1) { 
+							if(gameBoard.isOccupied(x,y)) {
+							if(gameBoard.getSquare(lastClicked).side.equals(gameBoard.getSquare(x,y).side)) {
+								lastClicked.setVector(x, y);
+								return;
+								}}
+						 
+							Board moveBoard = new Board();
+							moveBoard = gameBoard.clone(gameBoard);
 							
 							gameBoard.getSquare(lastClicked).move(new Vector(x,y), gameBoard);
+					
 							
 								if(!gameBoard.wasMoveInvalid) {
 									if(moveKey != maxMoveKey) {
 //										if(maxMoveKey == 1 ) { storedBoards.remove(1); break key;}
-										System.out.println("clear " + (moveKey+1) + " to " + maxMoveKey);
-										System.out.println("size " + storedBoards.size());
 										for(int j=maxMoveKey; j>=moveKey+1; j--) {
 											storedBoards.remove(j);
+											storedMoves.remove(j-1);
 										}
-										System.out.println("size " + storedBoards.size());
 									}
 								this.updateImageBoard(gameBoard);
 								storedBoards.add(gameBoard.clone(gameBoard));
 								
 								this.moveKey = gameBoard.getMoveCount();
 								maxMoveKey = gameBoard.getMoveCount();
-								System.out.println("move " + moveKey + " max " + (maxMoveKey));
-
-								}
-							
+								moveNotator mover = new moveNotator(moveBoard.getSquare(lastClicked), gameBoard.wasEP || moveBoard.isOccupied(x,y), gameBoard.inCheck, 
+										gameBoard.checkMate, gameBoard.blackIsTop, moveBoard, new Vector(x,y), gameBoard.wasQC, gameBoard.wasKC);
+								storedMoves.add(mover.getMoveNotation());
+								this.printMoves(storedMoves);
+								}			
 						}
 						clicked *= -1;
-					}
-					 
-				 );
+					});	
 			 }
 		 }
 	 }
-	 
-
+	 public void printMoves(List<String> list) {
+		 String formattedMoves = " ";
+		 for(int i=0; i<list.size(); i++) {
+			 if(i % 2 == 0) formattedMoves += "\n" + Integer.toString(i/2 + 1) + ".   ";
+			 formattedMoves += list.get(i) + "\t   ";
+		 }
+		 moveLabel.setText(formattedMoves);
+	 }
  } 
 
