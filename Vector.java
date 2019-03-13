@@ -31,16 +31,16 @@ public class Vector {
 		ArrayList<Vector> moves = new ArrayList<Vector>();
 		Vector v;
 		v = new Vector(this.getX()+1, this.getY()-1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX()+1, this.getY()+1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX()-1, this.getY()-1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX()-1, this.getY()+1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		return moves;
     }
@@ -57,23 +57,23 @@ public class Vector {
  		ArrayList<Vector> moves = new ArrayList<Vector>();
 		Vector v;
 		v = new Vector(this.getX(), this.getY()-1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX(), this.getY()+1);
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX()-1, this.getY());
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);
 		v = new Vector(this.getX()+1, this.getY());
-		if(v.checkInBounds() == true)
+		if(v.checkInBounds())
 		moves.add(v);	
 
  		return moves;
      } 
-    public void print() {
-    	System.out.println(this.getX() + "," + this.getY());
-    }
+//    public void print() {
+//    	System.out.println(this.getX() + "," + this.getY());
+//    }
     
     public int getX(){
         return x;
