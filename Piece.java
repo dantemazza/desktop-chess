@@ -76,7 +76,7 @@ public abstract class Piece implements Cloneable {
 	public static boolean isValidPawnMove(Vector a, Vector b, Pawn p) {
 		
 		boolean side2 = ((p.sideOfBoard == "Top" && a.getY()-b.getY() == 2) || 
-				(p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -2)) && p.hasMoved == false;
+				(p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -2)) && !p.hasMoved;
 		boolean side1 =  (p.sideOfBoard == "Top" && a.getY()-b.getY() == 1) || 
 				(p.sideOfBoard == "Bottom" && a.getY()-b.getY() == -1);
 		return (side2 || side1) && (a.getX() == b.getX());
@@ -172,7 +172,7 @@ public abstract class Piece implements Cloneable {
 
 		@Override
 		void move(Vector place, Board b) {
-			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)) == true) {		
+			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b))) {		
 				b.move(this, place);
 			}else {b.wasMoveInvalid = true;}
 		}}
