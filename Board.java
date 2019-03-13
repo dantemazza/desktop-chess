@@ -4,7 +4,7 @@ import java.util.ArrayList;
 	public class Board{
 	private Piece board[][] = new Piece[8][8];
 	char letters = 'a';
-	public boolean inCheck, inDoubleCheck, isATestBoard = false, checkMate;
+	public boolean inCheck, inDoubleCheck, isATestBoard = false, checkMate, staleMate;
 	private int whiteScore, blackScore, moveCount=0;
 	private String capturedSide;
 	public int whoseTurn = 1; 
@@ -80,7 +80,7 @@ import java.util.ArrayList;
 		 lastPieceEnd.setVector(place);
 		 
 		 
-		 if(this.isATestBoard == false) {
+		 if(!this.isATestBoard) {
 			 lastPieceMoved = piece;
 			 
 			 if(lastPieceMoved instanceof Pawn && (lastPieceEnd.getY() == 0 || lastPieceEnd.getY() == 7))
@@ -109,7 +109,6 @@ import java.util.ArrayList;
 				try {
 					boardClone.board[a][b] = (Piece)c.board[a][b].clone();
 				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
 				}}
 			}
 		}
@@ -194,20 +193,19 @@ import java.util.ArrayList;
 	 
 			
 		 }}	 
-		 System.out.println("moveInvalid bypass");
 		return false;
 	}	
 	// prints the board on the console
-	public void print() {
-		for(int c=7; c>-1; c--) {
-			if(c!=7) System.out.println();
-			for(int b=0; b<8; b++){
-			try{System.out.print(board[b][c].name + " ");}
-			catch(NullPointerException e){System.out.print(" 0  ");}
-			}}
-		System.out.println();
-		
-	}
+//	public void print() {
+//		for(int c=7; c>-1; c--) {
+//			if(c!=7) System.out.println();
+//			for(int b=0; b<8; b++){
+//			try{System.out.print(board[b][c].name + " ");}
+//			catch(NullPointerException e){System.out.print(" 0  ");}
+//			}}
+//		System.out.println();
+//		
+//	}
 
 	/* this method is  adjusted to apply to any piece input. In the context of a non-king parameter, 
 	   the method is used to determine if a piece delivering the only check to a king can be captured 
@@ -407,7 +405,7 @@ import java.util.ArrayList;
 	public void move(Piece piece, Vector place) { 
 		wasEP = false; wasQC = false; wasKC = false;
 		if((this.isOccupied(place) && this.getSquare(place).side == piece.side) ||
-			(this.isATestBoard == false && (whoseTurn == 1 && piece.side == black) || (whoseTurn == -1 && piece.side == white)))
+			(!this.isATestBoard && (whoseTurn == 1 && piece.side == black) || (whoseTurn == -1 && piece.side == white)))
 			 return;
 		
 		 if(!isATestBoard && moveCount >= 0) {
@@ -429,7 +427,7 @@ import java.util.ArrayList;
 		 				 wasMoveInvalid = true; 
 		 				 return;
 		 			 }
-		 			 if(!(this.getSquare(7,7).hasMoved == false && this.getSquare(6,7) == null &&
+		 			 if(!(!this.getSquare(7,7).hasMoved && this.getSquare(6,7) == null &&
 		 				  this.getSquare(5,7) == null)) { 
 		 				 	wasMoveInvalid = true;
 		 				 	return;
@@ -440,7 +438,7 @@ import java.util.ArrayList;
 		 			}
 		 			case("Top"):{ 
 		 			 if(!this.isOccupied(7,0)) return;
-			 		 if(!(this.getSquare(7,0).hasMoved == false && this.getSquare(6,0) == null &&
+			 		 if(!(!this.getSquare(7,0).hasMoved && this.getSquare(6,0) == null &&
 				 		  this.getSquare(5,0) == null)) {
 			 			 	wasMoveInvalid = true;
 			 			 	return;
@@ -458,7 +456,7 @@ import java.util.ArrayList;
 		 				 wasMoveInvalid = true;
 		 				 return;
 		 			 }
-			 		 if(!(this.getSquare(0,7).hasMoved == false && this.getSquare(1,7) == null &&
+			 		 if(!(!this.getSquare(0,7).hasMoved && this.getSquare(1,7) == null &&
 				 		   this.getSquare(2,7) == null && this.getSquare(3,7) == null)) return;
 			 		 
 			 		 wasQC = true;
@@ -468,7 +466,7 @@ import java.util.ArrayList;
 		 				
 		 			case("Top"):{
 		 			 if(!this.isOccupied(0,0)) return;
-				 	 if(!(this.getSquare(0,0).hasMoved == false && this.getSquare(1,0) == null &&
+				 	 if(!(!this.getSquare(0,0).hasMoved && this.getSquare(1,0) == null &&
 						   this.getSquare(2,0) == null && this.getSquare(3,0) == null)) return;
 				 	 wasQC = true;
 			     	 this.castle(new Vector(0,0), false, blackIsTop);		
@@ -485,7 +483,7 @@ import java.util.ArrayList;
 		 				 wasMoveInvalid = true; 
 		 				 return;
 		 			 }
-		 			 if(!(this.getSquare(0,7).hasMoved == false && this.getSquare(1,7) == null &&
+		 			 if(!(!this.getSquare(0,7).hasMoved && this.getSquare(1,7) == null &&
 		 				  this.getSquare(2,7) == null)) { 
 		 				 	wasMoveInvalid = true;
 		 				 	return;
@@ -496,7 +494,7 @@ import java.util.ArrayList;
 		 			}
 		 			case("Top"):{ 
 		 			 if(!this.isOccupied(0,0)) return;
-			 		 if(!(this.getSquare(0,0).hasMoved == false && this.getSquare(1,0) == null &&
+			 		 if(!(!this.getSquare(0,0).hasMoved && this.getSquare(1,0) == null &&
 				 		  this.getSquare(2,0) == null)) {
 			 			 	wasMoveInvalid = true;
 			 			 	return;
@@ -514,7 +512,7 @@ import java.util.ArrayList;
 		 				 wasMoveInvalid = true;
 		 				 return;
 		 			 }
-			 		 if(!(this.getSquare(7,7).hasMoved == false && this.getSquare(6,7) == null &&
+			 		 if(!(!this.getSquare(7,7).hasMoved && this.getSquare(6,7) == null &&
 				 		   this.getSquare(5,7) == null && this.getSquare(4,7) == null)) return;
 			 		 
 			 		 wasQC = true;
@@ -525,7 +523,7 @@ import java.util.ArrayList;
 		 			
 		 			case("Top"):{
 		 			 if(!this.isOccupied(7,0)) return;
-				 	 if(!(this.getSquare(7,0).hasMoved == false && this.getSquare(6,0) == null &&
+				 	 if(!(!this.getSquare(7,0).hasMoved && this.getSquare(6,0) == null &&
 						   this.getSquare(5,0) == null && this.getSquare(4,0) == null)) return;
 				 	 
 				 	 wasQC = true;
@@ -564,16 +562,14 @@ import java.util.ArrayList;
 
 			 if(inCheck==false && moveCount > 6 && !this.isATestBoard) {
 				 if(this.isStalemate(sideStale)) {
-					 System.out.println("Stalemate!");
-					 System.exit(0);
+					 staleMate = true;
 				 }}				
 			String sideCheck = "";
 			
-			if(!this.isATestBoard && inCheck == true) {
+			if(!this.isATestBoard && inCheck) {
 				if(lastPieceMoved.side == white) sideCheck = black;
 				if(lastPieceMoved.side == black) sideCheck = white; 
 				if(this.isCheckmate(sideCheck)) {
-					System.out.println("Checkmate! " + lastPieceMoved.side + " wins !");
 					checkMate = true;
 				}}}
 	public void castle(Vector rookPos, boolean kingSide, boolean blackTop){
@@ -619,14 +615,14 @@ import java.util.ArrayList;
 			if(!this.validateMove(kingInCheck, kingMoves.get(a), true)) { return false; }
 		} 
 		//if no legal king moves and double check, checkmate
-		if(this.inDoubleCheck == true) return true;
+		if(this.inDoubleCheck) return true;
 		
 		if(this.isInCheck(lastPieceToCheck)) return false;
 		
 		//if no legal king moves and piece is knight/pawn and cannot be captured legally, checkmate
 		if(lastPieceToCheck instanceof Knight || lastPieceToCheck instanceof Pawn) return true;
 		
-		if(this.canBlock(this.getBlockSquares(kingInCheck.getPosition(), lastPieceToCheck.getPosition()), sideInCheck) == true) return false;
+		if(this.canBlock(this.getBlockSquares(kingInCheck.getPosition(), lastPieceToCheck.getPosition()), sideInCheck)) return false;
 
 
 		return true;
@@ -763,10 +759,10 @@ import java.util.ArrayList;
 		return moves;
 	}
 	
-	public static void printList(ArrayList<Vector> list) {
-		System.out.println("startlist");
-		for(int i=0; i<list.size(); i++)
-		System.out.println(list.get(i).getX() + "," + list.get(i).getY());
-		System.out.println("endlist");
-	}	
+//	public static void printList(ArrayList<Vector> list) {
+//		System.out.println("startlist");
+//		for(int i=0; i<list.size(); i++)
+//		System.out.println(list.get(i).getX() + "," + list.get(i).getY());
+//		System.out.println("endlist");
+//	}	
 }
