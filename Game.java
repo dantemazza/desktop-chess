@@ -17,7 +17,7 @@ public class Game extends Application{
 	Label squares[][] = new Label[8][8];
 	Board gameBoard;
 	BorderPane pane = new BorderPane();
-	String topSide, bottomSide;
+	String topSide, bottomSide, endSpec = "";
 
 	Label moveLabel = new Label();
 	Vector lastClicked = new Vector();
@@ -26,6 +26,7 @@ public class Game extends Application{
 	ArrayList<Board> storedBoards = new ArrayList<Board>();
 	ArrayList<String> storedMoves = new ArrayList<String>();
 	int moveKey = 0, maxMoveKey = 0, side = 1;
+	boolean end = false;
 	
 	public void start(Stage primaryStage) throws Exception{
 		gameBoard = new Board(black, white);
@@ -57,7 +58,6 @@ public class Game extends Application{
 	 public void setBoard(String top, String bottom) {
 		 topSide = top;
 		 bottomSide = bottom; 
-		 Label h[][] = new Label[8][8];
 		 GridPane board = new GridPane();
 		 int c = 1;
 		
@@ -115,7 +115,7 @@ public class Game extends Application{
 		undo.setOnMouseClicked(e ->{
 			if(moveKey == 0) return;
 			gameBoard = storedBoards.get(moveKey-1).clone(storedBoards.get(moveKey-1));
-			this.printMoves(storedMoves.subList(0,moveKey-1));
+			this.printMoves(storedMoves.subList(0,moveKey-1), endSpec);
 			moveKey--; 
 			this.updateImageBoard(gameBoard);
 		});
@@ -129,7 +129,7 @@ public class Game extends Application{
 		redo.setOnMouseClicked(e ->{
 			if(moveKey == maxMoveKey) return;
 			moveKey++;
-			this.printMoves(storedMoves.subList(0,moveKey));
+			this.printMoves(storedMoves.subList(0,moveKey), endSpec);
 			gameBoard = storedBoards.get(moveKey).clone(storedBoards.get(moveKey));
 			this.updateImageBoard(gameBoard);
 		});
@@ -165,6 +165,7 @@ public class Game extends Application{
 				this.setBottom();	
 				storedBoards.add(gameBoard.clone(gameBoard));
 				moveKey = 0; maxMoveKey = 0;
+				end = false; endSpec = "";
 			});
 			
 			top.getChildren().addAll(changeSide, exit);
@@ -286,7 +287,7 @@ public class Game extends Application{
 		 for(int w=0; w<8; w++) {
 			 for(int z=0; z<8; z++) { 
 				 final int x = w, y = z;
-				 squares[x][y].setOnMouseClicked(e ->{	
+				 squares[x][y].setOnMouseClicked(e ->{ if(end) return;
 						if(gameBoard.checkMate) return;
 
 						if(clicked == -1) {
@@ -324,7 +325,14 @@ public class Game extends Application{
 								moveNotator mover = new moveNotator(moveBoard.getSquare(lastClicked), gameBoard.wasEP || moveBoard.isOccupied(x,y), gameBoard.inCheck, 
 										gameBoard.checkMate, gameBoard.blackIsTop, moveBoard, new Vector(x,y), gameBoard.wasQC, gameBoard.wasKC);
 								storedMoves.add(mover.getMoveNotation());
-								this.printMoves(storedMoves);
+								if(gameBoard.staleMate) endSpec = "0.5-0.5";
+								if(gameBoard.checkMate) {
+									if(gameBoard.whoseTurn == -1) endSpec = "1-0";
+									if(gameBoard.whoseTurn == 1) endSpec = "0-1";
+								}
+								if(gameBoard.checkMate || gameBoard.staleMate) { end = true; }
+								this.printMoves(storedMoves, endSpec);
+								
 								}			
 						}
 						clicked *= -1;
@@ -332,11 +340,17 @@ public class Game extends Application{
 			 }
 		 }
 	 }
-	 public void printMoves(List<String> list) {
+	 public void printMoves(List<String> list, String theEnd) {
 		 String formattedMoves = " ";
 		 for(int i=0; i<list.size(); i++) {
-			 if(i % 2 == 0) formattedMoves += "\n" + Integer.toString(i/2 + 1) + ".   ";
-			 formattedMoves += list.get(i) + "\t   ";
+			 if(i % 2 == 0) { formattedMoves += "\n" + Integer.toString(i/2 + 1);
+			 if(i<18) formattedMoves += ".          ";
+			 if(i>=18 && i<198) formattedMoves += ".        ";
+			 if(i>199) formattedMoves += ".         ";
+			 }
+			 formattedMoves += list.get(i) + "\t      ";
+			 if(i % 2 == 0 && i == maxMoveKey-1 && end) formattedMoves += endSpec;
+			 if(i % 2 !=0 && i == maxMoveKey-1 && end) formattedMoves += "\n      " + endSpec;
 		 }
 		 moveLabel.setText(formattedMoves);
 	 }
