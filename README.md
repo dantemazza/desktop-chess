@@ -1,4 +1,4 @@
-To run the jar file, place it in your CMDL target directory and use the command 'java -jar chess.jar'.
+To run the jar file, place it in your command prompt target directory and use the command 'java -jar chess.jar'.
 
 
 
