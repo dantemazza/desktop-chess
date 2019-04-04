@@ -11,8 +11,8 @@ import javafx.stage.*;
 import javafx.scene.image.*;
 
 public class Game extends Application{
-	 final String white = "white";
-	 final String black = "black";
+	final String white = "white";
+	final String black = "black";
 	int clicked = -1;
 	Label squares[][] = new Label[8][8];
 	Board gameBoard;
@@ -51,9 +51,9 @@ public class Game extends Application{
 		
 	}
 	 public static void main(String args[]) {
+		 launch(args);
 		 
-		 launch(args);}
-	 
+		 }
 	 
 	 public void setBoard(String top, String bottom) {
 		 topSide = top;
@@ -85,7 +85,7 @@ public class Game extends Application{
 				 num.setMinSize(15, 80);
 				 left.getChildren().add(num); 
 			 }
-		 }else {
+		 }else{
 			 for(int a=8; a>0; a--) {
 				 Label num = new Label("  " + Integer.toString(a) + " ");
 				 num.setMinSize(15, 80);
@@ -167,8 +167,21 @@ public class Game extends Application{
 				moveKey = 0; maxMoveKey = 0;
 				end = false; endSpec = "";
 			});
+		Button draw = new Button("Claim Draw");
+			draw.setOnAction(e ->{
+				draws:{ 
+						if(moveKey<6) break draws;
+						if(this.isThreeFoldRepitition()) {
+						gameBoard.staleMate = true;
+						end = true;
+						if(gameBoard.staleMate) endSpec = "0.5-0.5";
+						this.printMoves(storedMoves, endSpec);
+						}
+				}
+			});
 			
-			top.getChildren().addAll(changeSide, exit);
+			
+			top.getChildren().addAll(changeSide, draw, exit);
 			exit.setOnAction(e -> System.exit(0));
 			pane.setTop(top);
 	 }
@@ -342,6 +355,7 @@ public class Game extends Application{
 	 }
 	 public void printMoves(List<String> list, String theEnd) {
 		 String formattedMoves = " ";
+		 if(end && gameBoard.whoseTurn == 1) theEnd = "      " + theEnd;
 		 for(int i=0; i<list.size(); i++) {
 			 if(i % 2 == 0) { formattedMoves += "\n" + Integer.toString(i/2 + 1);
 			 if(i<18) formattedMoves += ".          ";
@@ -349,10 +363,44 @@ public class Game extends Application{
 			 if(i>199) formattedMoves += ".         ";
 			 }
 			 formattedMoves += list.get(i) + "\t      ";
-			 if(i % 2 == 0 && i == maxMoveKey-1 && end) formattedMoves += endSpec;
-			 if(i % 2 !=0 && i == maxMoveKey-1 && end) formattedMoves += "\n      " + endSpec;
+			 if(i % 2 == 0 && i == maxMoveKey-1 && end) formattedMoves += theEnd;
+			 if(i % 2 !=0 && i == maxMoveKey-1 && end) formattedMoves += "\n      " + theEnd;
 		 }
 		 moveLabel.setText(formattedMoves);
 	 }
+	 
+	 public boolean isThreeFoldRepitition(){
+
+		 Board currBoard = storedBoards.get(moveKey);
+		 int instances = 0;
+		 System.out.println(storedBoards.size());
+		 for(int i = moveKey; i>=0; i -=2) {
+			 if(this.areTheSame(currBoard, storedBoards.get(i))) instances++;			 
+			 if(instances == 3) return true;
+		 }
+		 
+		 return false;
+	 }
+	 
+	 public boolean areTheSame(Board a, Board b) {
+		 
+		 for(int c=0; c<8; c++){
+			for(int d=0; d<8; d++){
+				Piece aPiece = a.getSquare(c,d);
+				Piece bPiece = b.getSquare(c,d);
+				if(!this.areTheSame(aPiece, bPiece)) return false;
+			}
+		 }
+		 
+		 return true;
+	 }
+	 
+	 public boolean areTheSame(Piece a, Piece b){
+		 if(a == null && b == null) return true;
+		 else if(a == null || b == null) return false;
+		 return (a.side == b.side) && (a.getClass().equals(b.getClass()));
+	 }
+	 
+	 
  } 
 

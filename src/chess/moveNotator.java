@@ -43,6 +43,7 @@ public class moveNotator {
 		if(wasMate) { moveNotation += "#"; return; }
 		if(wasCheck) moveNotation += "+";
 		
+		if(moveNotation.length() == 2 && moveNotation.charAt(0) == 'f' && board.whoseTurn == 1) moveNotation += "\t";
 		
 	}
 	
