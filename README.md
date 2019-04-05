@@ -36,4 +36,4 @@ Game: Defines the JavaFX application and controls game graphics:
       and the appropriate piece image is set on all squares(if it is occupied)
      -Synchronizes an array of move strings with the stored boards to enable harmonious move undoing and redoing
      -Allows flipping side perspective (resets the game)
-     -Draws may be claimed according to three-fold repeition and the 50 move rule.
+     -Draws may be claimed according to three-fold repetition and the 50 move rule.
