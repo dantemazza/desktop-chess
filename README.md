@@ -1,10 +1,10 @@
-To run the jar file, place it in your command prompt target directory and use the command 'java -jar chess.jar'.
+To run the jar file, place it in your command prompt target directory(directory set using cd (pathname))and use the command 'java -jar chess.jar'.
 
 
 
 Each class explained:
 
-Vector: Basis unit for controlling the geometric aspects of the board. Vital functions controlled include:
+Vector: Basis unit for controlling the geometric aspects of the board. Vital functions include:
         
        -Tracking piece positions
        -Returning all peripheral squares for iterative purposes (checking stalemate, etc.)
@@ -36,3 +36,4 @@ Game: Defines the JavaFX application and controls game graphics:
       and the appropriate piece image is set on all squares(if it is occupied)
      -Synchronizes an array of move strings with the stored boards to enable harmonious move undoing and redoing
      -Allows flipping side perspective (resets the game)
+     -Draws may be claimed according to three-fold repeition and the 50 move rule.
