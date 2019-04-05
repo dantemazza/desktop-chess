@@ -71,9 +71,9 @@ public class Vector {
 
  		return moves;
      } 
-//    public void print() {
-//    	System.out.println(this.getX() + "," + this.getY());
-//    }
+    public void print() {
+    	System.out.println(this.getX() + "," + this.getY());
+    }
     
     public int getX(){
         return x;

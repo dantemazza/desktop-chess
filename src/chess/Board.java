@@ -7,7 +7,7 @@ import java.util.ArrayList;
 	public boolean inCheck, inDoubleCheck, isATestBoard = false, checkMate, staleMate;
 	private int whiteScore, blackScore, moveCount=0;
 	private String capturedSide;
-	public int whoseTurn = 1; 
+	public int whoseTurn = 1, fiftyMoveCounter = 0; 
 	public Piece lastPieceMoved, lastPieceToCheck;
 	public Vector lastPieceStart = new Vector(), lastPieceEnd = new Vector();
 	public Vector whiteKingPosition, blackKingPosition;
@@ -76,6 +76,12 @@ import java.util.ArrayList;
 			}
 			else whiteKingPosition.setVector(place);
 		}	
+		
+		 fiftyMoveCounter++;
+		 if(piece instanceof Pawn) fiftyMoveCounter = 0;
+		 
+		
+		
 		 lastPieceStart.setVector(piece.getPosition());	
 		 lastPieceEnd.setVector(place);
 		 
@@ -546,11 +552,13 @@ import java.util.ArrayList;
 			if(Piece.isEnPassant(this, place) && place.getX() == lastPieceEnd.getX() && 
 				lastPieceEnd.getY() == piece.getPosition().getY()) {	
 					 this.updateScore();
+					 fiftyMoveCounter = 0;
 					 this.setSquare(null, lastPieceEnd);
 					 wasEP = true;
 				}
 		 	}
 		if(isOccupied(place)){	
+			 fiftyMoveCounter = 0;
 			 this.updateScore(); 
 		}	
 		

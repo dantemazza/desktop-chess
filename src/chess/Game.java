@@ -171,7 +171,7 @@ public class Game extends Application{
 			draw.setOnAction(e ->{
 				draws:{ 
 						if(moveKey<6) break draws;
-						if(this.isThreeFoldRepitition()) {
+						if(this.isThreeFoldRepitition() || gameBoard.fiftyMoveCounter > 99) {
 						gameBoard.staleMate = true;
 						end = true;
 						if(gameBoard.staleMate) endSpec = "0.5-0.5";
@@ -373,10 +373,10 @@ public class Game extends Application{
 
 		 Board currBoard = storedBoards.get(moveKey);
 		 int instances = 0;
-		 System.out.println(storedBoards.size());
+
 		 for(int i = moveKey; i>=0; i -=2) {
 			 if(this.areTheSame(currBoard, storedBoards.get(i))) instances++;			 
-			 if(instances == 3) return true;
+			 if(instances == 4) return true;
 		 }
 		 
 		 return false;
