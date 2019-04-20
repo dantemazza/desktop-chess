@@ -50,7 +50,10 @@ public class Game extends Application{
 		primaryStage.show();
 		
 	}
-
+	 public static void main(String args[]) {
+		 launch(args);
+		 
+		 }
 	 
 	 public void setBoard(String top, String bottom) {
 		 topSide = top;
@@ -372,7 +375,7 @@ public class Game extends Application{
 		 int instances = 0;
 
 		 for(int i = moveKey; i>=0; i -=2) {
-			 if(this.areTheSame(currBoard, storedBoards.get(i))) instances++;			 
+			 if(this.areTheSame(currBoard, storedBoards.get(i))) instances++;		
 			 if(instances == 4) return true;
 		 }
 		 
