@@ -1,5 +1,6 @@
 package chess;
-
+import javafx.scene.control.Dialog;
+import javafx.scene.control.TextInputDialog;
 import java.util.ArrayList;
 	public class Board{
 	private Piece board[][] = new Piece[8][8];
@@ -90,21 +91,13 @@ import java.util.ArrayList;
 			 lastPieceMoved = piece;
 			 
 			 if(lastPieceMoved instanceof Pawn && (lastPieceEnd.getY() == 0 || lastPieceEnd.getY() == 7))
-				 this.setSquare((Piece)new Queen(lastPieceEnd.getX(), lastPieceEnd.getY(), "Q" + moveCount, piece.side, piece.sideOfBoard), lastPieceEnd);
+				 this.setSquare(new Queen(lastPieceEnd.getX(), lastPieceEnd.getY(), "Q" + moveCount, piece.side, piece.sideOfBoard), lastPieceEnd);
 		 }
 		 moveCount++;
 		 whoseTurn *= -1; 
 		 piece.hasMoved = true;
 		 piece.setPosition(place);
-		 switch(whoseTurn) {
-		 case(1):{
-			 inCheck = this.isInCheck((King)this.getSquare(whiteKingPosition));			
-			 break;
-		 }
-		 case(-1):{
-			 inCheck = this.isInCheck((King)this.getSquare(blackKingPosition));
-			 break;
-		 }}	 
+		 inCheck = (whoseTurn == -1) ? this.isInCheck((King)this.getSquare(blackKingPosition)) : this.isInCheck((King)this.getSquare(whiteKingPosition));
 
 	}
 	public Board clone(Board c) {
@@ -183,23 +176,10 @@ import java.util.ArrayList;
 		 if(testCheck.getSquare(piece.getPosition()) != null) {return true;}
 		 /*adjusts "whoseTurn" in case it is not the players turn but we would still like to test moves for them
 		  */
-		 if(isntChecker)
-		 testCheck.whoseTurn *= -1;
-		 switch(testCheck.whoseTurn) {
-		 case(1):{ 
-
-			 return testCheck.isInCheck((King)testCheck.getSquare(testCheck.whiteKingPosition));
-			 
-			 
-		 }
-		 case(-1):{
-			 
-			 return testCheck.isInCheck((King)testCheck.getSquare(testCheck.blackKingPosition));
-			 
-	 
-			
-		 }}	 
-		return false;
+		 if(isntChecker) testCheck.whoseTurn *= -1;
+		 
+		 return (testCheck.whoseTurn == 1) ? testCheck.isInCheck((King)testCheck.getSquare(testCheck.whiteKingPosition)) : 
+		 testCheck.isInCheck((King)testCheck.getSquare(testCheck.blackKingPosition));
 	}	
 	// prints the board on the console
 //	public void print() {
