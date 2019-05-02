@@ -59,7 +59,7 @@ public abstract class Piece implements Cloneable {
 	public static boolean areHorzAdj(Piece p1, Piece p2) {
 		if(p1.Position.getX() - p2.Position.getX() == 1 && p1.Position.getY() == p2.Position.getY())
 			return true;
-			return false;
+		return false;
 	}
 	
 	
@@ -69,8 +69,7 @@ public abstract class Piece implements Cloneable {
 		if(!b.lastPieceMoved.getClass().getName().equals("chess.Pawn") ||  b.lastPieceEnd.getX() != b.lastPieceStart.getX() ||
 			Math.abs(b.lastPieceEnd.getY()-b.lastPieceStart.getY()) != 2 || place.getX() != b.lastPieceEnd.getX()) 
 			return false;
-				
-			return true;
+		return true;
 	}
 	
 	public static boolean isValidPawnMove(Vector a, Vector b, Pawn p) {
@@ -108,10 +107,8 @@ public abstract class Piece implements Cloneable {
 			}
 			
 		}
-			
-			
 			return true;
-		}
+	}
 		
 	public static boolean isClearDiagPath(Vector a, Vector b, Board c) {
 		int j = 0;
@@ -162,7 +159,7 @@ public abstract class Piece implements Cloneable {
 			if (isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b)
 				|| isDiagonal(this.getPosition(), place) && isClearDiagPath(place, this.getPosition(), b)){
 				b.move(this, place);
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 		}}
 	class Rook extends Piece{
 		Rook(int x, int y, String name, String side, String sideOfBoard) {
@@ -174,7 +171,7 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if((isHorzVert(this.getPosition(), place) && isClearHorzVertPath(this.getPosition(), place, b))) {		
 				b.move(this, place);
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 		}}
 	class Bishop extends Piece{
 		Bishop(int x, int y, String name, String side, String sideOfBoard) {
@@ -186,7 +183,7 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if(isDiagonal(this.getPosition(), place) && isClearDiagPath(place, this.getPosition(), b)) {
 				b.move(this, place);
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 			
 		}}
 	class King extends Piece{
@@ -201,7 +198,7 @@ public abstract class Piece implements Cloneable {
 					this.hasMoved ==false) {
 				b.move(this, place);
 				
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 			
 		}}
 	class Knight extends Piece{
@@ -214,7 +211,7 @@ public abstract class Piece implements Cloneable {
 		void move(Vector place, Board b) {
 			if(isL(this.getPosition(), place)) { 
 			b.move(this, place);
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 		}} 
 	class Pawn extends Piece{
 
@@ -229,7 +226,7 @@ public abstract class Piece implements Cloneable {
 					isPawnCapture(place, this.getPosition(), this)) {
 			b.move(this, place);	
 			
-			}else {b.wasMoveInvalid = true;}
+			}else b.wasMoveInvalid = true;
 		}}
 
 

@@ -18,7 +18,7 @@ public class Game extends Application{
 	Board gameBoard;
 	BorderPane pane = new BorderPane();
 	String topSide, bottomSide, endSpec = "";
-
+	Button queen;
 	Label moveLabel = new Label();
 	Vector lastClicked = new Vector();
 	Image leftArrow = new Image("/left_arrow.png");
@@ -168,20 +168,22 @@ public class Game extends Application{
 				end = false; endSpec = "";
 			});
 		Button draw = new Button("Claim Draw");
-			draw.setOnAction(e ->{
-				draws:{ 
-						if(moveKey<6) break draws;
-						if(this.isThreeFoldRepitition() || gameBoard.fiftyMoveCounter > 99) {
-						gameBoard.staleMate = true;
-						end = true;
-						if(gameBoard.staleMate) endSpec = "0.5-0.5";
-						this.printMoves(storedMoves, endSpec);
-						}
-				}
-			});
-			
-			
-			top.getChildren().addAll(changeSide, draw, exit);
+		draw.setOnAction(e ->{
+			draws:{ 
+					if(moveKey<6) break draws;
+					if(this.isThreeFoldRepitition() || gameBoard.fiftyMoveCounter > 99) {
+					gameBoard.staleMate = true;
+					end = true;
+					if(gameBoard.staleMate) endSpec = "0.5-0.5";
+					this.printMoves(storedMoves, endSpec);
+					}
+			}
+	   });
+	   queen = new Button("Auto Queen");
+	   queen.setOnAction(e ->{
+		   gameBoard.autoQueen = gameBoard.autoQueen ? false : true;   
+	   });
+			top.getChildren().addAll(changeSide, draw, queen, exit);
 			exit.setOnAction(e -> System.exit(0));
 			pane.setTop(top);
 	 }
@@ -300,8 +302,8 @@ public class Game extends Application{
 		 for(int w=0; w<8; w++) {
 			 for(int z=0; z<8; z++) { 
 				 final int x = w, y = z;
-				 squares[x][y].setOnMouseClicked(e ->{ if(end) return;
-						if(gameBoard.checkMate) return;
+				 squares[x][y].setOnMouseClicked(e ->{
+						if(gameBoard.checkMate || end) return;
 
 						if(clicked == -1) {
 							if(!gameBoard.isOccupied(x,y)) return;
@@ -318,7 +320,7 @@ public class Game extends Application{
 						 
 							Board moveBoard = new Board();
 							moveBoard = gameBoard.clone(gameBoard);
-							
+							queen.setDisable(true);
 							gameBoard.getSquare(lastClicked).move(new Vector(x,y), gameBoard);
 					
 							
@@ -333,7 +335,7 @@ public class Game extends Application{
 								this.updateImageBoard(gameBoard);
 								storedBoards.add(gameBoard.clone(gameBoard));
 								
-								this.moveKey = gameBoard.getMoveCount();
+								moveKey = gameBoard.getMoveCount();
 								maxMoveKey = gameBoard.getMoveCount();
 								moveNotator mover = new moveNotator(moveBoard.getSquare(lastClicked), gameBoard.wasEP || moveBoard.isOccupied(x,y), gameBoard.inCheck, 
 										gameBoard.checkMate, gameBoard.blackIsTop, moveBoard, new Vector(x,y), gameBoard.wasQC, gameBoard.wasKC);
