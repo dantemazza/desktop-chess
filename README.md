@@ -1,5 +1,7 @@
 # ChessApp
 
+![](images/board.JPG)
+
 ## Setup
 To run the jar file, place it in your command prompt target directory(directory set using cd (pathname))and use the command 'java -jar chess.jar'.
 
