@@ -1,4 +1,4 @@
-# ChessApp
+# desktop-chess
 
 ![](images/board.JPG)
 
